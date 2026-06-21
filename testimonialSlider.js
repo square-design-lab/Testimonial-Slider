@@ -7728,6 +7728,8 @@
     speed: 500,
     autoplay: false,
     autoplayDelay: 5000,
+    autoplayMode: 'default',   // 'default' | 'continuous'
+    slidesPerGroup: 1,
     pauseOnHover: true,
     loop: true,
 
@@ -8192,9 +8194,21 @@
     '.' + CSS_PREFIX + 'wrapper .swiper {' +
     '  overflow: hidden;' +
     '  width: 100%;' +
+    '  padding: 2px;' +
+    '  margin: -2px;' +
     '}' +
     '.' + CSS_PREFIX + 'wrapper.sdl-ts-overflow .swiper {' +
     '  overflow: visible;' +
+    '}' +
+    '.' + CSS_PREFIX + 'wrapper.sdl-ts-continuous .swiper-wrapper {' +
+    '  transition-timing-function: linear !important;' +
+    '}' +
+    '.' + CSS_PREFIX + 'wrapper .swiper:focus {' +
+    '  outline: 2px solid currentColor;' +
+    '  outline-offset: 4px;' +
+    '}' +
+    '.' + CSS_PREFIX + 'wrapper .swiper:focus:not(:focus-visible) {' +
+    '  outline: none;' +
     '}' +
     '.' + CSS_PREFIX + 'wrapper .swiper-slide {' +
     '  box-sizing: border-box;' +
@@ -8584,6 +8598,7 @@
     var wrapper = document.createElement('div');
     wrapper.className = CSS_PREFIX + 'wrapper';
     if (settings.overflow) wrapper.classList.add(CSS_PREFIX + 'overflow');
+    if (settings.autoplay && settings.autoplayMode === 'continuous') wrapper.classList.add(CSS_PREFIX + 'continuous');
 
     // Set CSS custom properties for card styling
     if (settings.cardBorder) {
@@ -8608,14 +8623,22 @@
     // Swiper container
     var swiperEl = document.createElement('div');
     swiperEl.className = 'swiper';
+    swiperEl.setAttribute('role', 'region');
+    swiperEl.setAttribute('aria-roledescription', 'carousel');
+    swiperEl.setAttribute('aria-label', 'Testimonials');
+    swiperEl.tabIndex = 0;
 
     var swiperWrapper = document.createElement('div');
     swiperWrapper.className = 'swiper-wrapper';
+    swiperWrapper.setAttribute('aria-live', settings.autoplay ? 'off' : 'polite');
 
     // Build slides
     testimonials.forEach(function (t, idx) {
       var slide = document.createElement('div');
       slide.className = 'swiper-slide';
+      slide.setAttribute('role', 'group');
+      slide.setAttribute('aria-roledescription', 'slide');
+      slide.setAttribute('aria-label', (idx + 1) + ' of ' + testimonials.length + (t.name ? ': ' + t.name : ''));
       slide.innerHTML = buildSlideHTML(t, idx, settings);
       swiperWrapper.appendChild(slide);
     });
@@ -8689,8 +8712,21 @@
       speed: settings.speed,
       spaceBetween: settings.spaceBetween,
       slidesPerView: settings.slidesPerView,
+      slidesPerGroup: settings.slidesPerGroup || 1,
       loop: settings.loop && totalSlides > settings.slidesPerView,
       grabCursor: true,
+      keyboard: { enabled: true, onlyInViewport: true },
+      a11y: {
+        enabled: true,
+        prevSlideMessage: 'Previous testimonial',
+        nextSlideMessage: 'Next testimonial',
+        firstSlideMessage: 'This is the first testimonial',
+        lastSlideMessage: 'This is the last testimonial',
+        paginationBulletMessage: 'Go to testimonial {{index}}',
+        containerMessage: 'Testimonial slider',
+        containerRoleDescriptionMessage: 'carousel',
+        itemRoleDescriptionMessage: 'testimonial',
+      },
       breakpoints: {
         0: {
           slidesPerView: settings.mobileSlides,
@@ -8741,11 +8777,22 @@
 
     // Autoplay
     if (settings.autoplay) {
-      config.autoplay = {
-        delay: settings.autoplayDelay,
-        disableOnInteraction: false,
-        pauseOnMouseEnter: !!settings.pauseOnHover,
-      };
+      if (settings.autoplayMode === 'continuous') {
+        config.autoplay = {
+          delay: 0,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: !!settings.pauseOnHover,
+        };
+        config.speed = settings.speed || 3000;
+        config.loop = true;
+        config.allowTouchMove = true;
+      } else {
+        config.autoplay = {
+          delay: settings.autoplayDelay,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: !!settings.pauseOnHover,
+        };
+      }
     }
 
     // Navigation — arrows

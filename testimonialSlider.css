@@ -52,10 +52,25 @@ section[id^="testimonial-slider"][data-sdl-ts-state="ready"] .summary-block-wrap
 .sdl-ts-wrapper .swiper {
   overflow: hidden;
   width: 100%;
+  padding: 2px;
+  margin: -2px;
 }
 
 .sdl-ts-wrapper.sdl-ts-overflow .swiper {
   overflow: visible;
+}
+
+.sdl-ts-wrapper.sdl-ts-continuous .swiper-wrapper {
+  transition-timing-function: linear !important;
+}
+
+.sdl-ts-wrapper .swiper:focus {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+.sdl-ts-wrapper .swiper:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .sdl-ts-wrapper.sdl-ts-has-bottom-nav {

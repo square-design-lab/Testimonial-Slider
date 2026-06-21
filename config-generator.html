@@ -482,9 +482,21 @@
                 <div class="group-header" onclick="togGroup(this)">Autoplay</div>
                 <div class="group-body">
                     <div class="toggle-row"><label>Autoplay</label><input type="checkbox" id="autoplay"></div>
+                    <div class="control-row" id="autoplayModeRow" style="display:none;">
+                        <label>Autoplay Mode</label>
+                        <select id="autoplayMode">
+                            <option value="default" selected>Default (pause between slides)</option>
+                            <option value="continuous">Continuous (marquee)</option>
+                        </select>
+                    </div>
                     <div class="control-row" id="autoplayDelayRow" style="display:none;">
                         <label>Autoplay Delay (ms)</label>
                         <input type="number" id="autoplayDelay" value="5000" min="500">
+                    </div>
+                    <div class="control-row" id="slidesPerGroupRow" style="display:none;">
+                        <label>Slides Per Transition</label>
+                        <input type="number" id="slidesPerGroup" value="1" min="1" max="5">
+                        <div class="helper-text">Number of slides to advance per autoplay step.</div>
                     </div>
                     <div class="toggle-row" id="pauseOnHoverRow" style="display:none;"><label>Pause on Hover</label><input type="checkbox" id="pauseOnHover" checked></div>
                 </div>
@@ -590,6 +602,19 @@
                 </div>
             </div>
 
+            <!-- COLORFUL PALETTE -->
+            <div class="group" id="colorfulPaletteGroup" style="display:none;">
+                <div class="group-header" onclick="togGroup(this)">Color Palette</div>
+                <div class="group-body">
+                    <div class="control-row">
+                        <label>Number of Colors</label>
+                        <input type="number" id="colorCount" value="6" min="2" max="12">
+                        <div class="helper-text">Colors repeat in pattern across slides (e.g. 3 colors → 1,2,3,1,2,3...).</div>
+                    </div>
+                    <div id="colorSwatches" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;"></div>
+                </div>
+            </div>
+
             <!-- CONTENT MAPPING -->
             <div class="group">
                 <div class="group-header" onclick="togGroup(this)">Content Mapping</div>
@@ -638,7 +663,7 @@
           spvSm: 1, spvMd: 2, spvLg: 3,
           spaceBetween: 24, speed: 500,
           loop: true, overflowVisible: false,
-          autoplay: false, autoplayDelay: 5000, pauseOnHover: true,
+          autoplay: false, autoplayDelay: 5000, autoplayMode: 'default', slidesPerGroup: 1, pauseOnHover: true,
           arrows: true, arrowStyle: 'icon', prevText: 'Prev', nextText: 'Next',
           arrowsPosition: 'bottom-center',
           dots: false, dotsPosition: 'bottom-center',
@@ -679,7 +704,7 @@
             spvSm: num('spvSm'), spvMd: num('spvMd'), spvLg: num('spvLg'),
             spaceBetween: num('spaceBetween'), speed: num('speed'),
             loop: chk('loop'), overflowVisible: chk('overflowVisible'),
-            autoplay: chk('autoplay'), autoplayDelay: num('autoplayDelay'), pauseOnHover: chk('pauseOnHover'),
+            autoplay: chk('autoplay'), autoplayDelay: num('autoplayDelay'), autoplayMode: val('autoplayMode'), slidesPerGroup: num('slidesPerGroup'), pauseOnHover: chk('pauseOnHover'),
             arrows: chk('arrows'), arrowStyle: val('arrowStyle'),
             prevText: val('prevText'), nextText: val('nextText'),
             arrowsPosition: val('arrowsPosition'),
@@ -733,7 +758,8 @@
             let extraStyle = cardStyle;
             let extraContent = '';
             if (layout === 'colorful') {
-              const bgc = COLORFUL_PALETTE[i % COLORFUL_PALETTE.length];
+              const palette = getColorPalette();
+              const bgc = palette[i % palette.length];
               extraStyle += `; background: ${bgc} !important; border: none !important`;
             } else if (layout === 'review') {
               extraStyle += `; background: #1a3a2a !important; color: #f5f0e8 !important; border: none !important`;
@@ -866,9 +892,12 @@
           // Counter position
           document.getElementById('counterPosRow').style.display = counterOn ? 'block' : 'none';
 
-          // Autoplay delay + pause on hover
+          // Autoplay sub-options
           const autoplayOn = chk('autoplay');
-          document.getElementById('autoplayDelayRow').style.display = autoplayOn ? 'block' : 'none';
+          const isContinuous = val('autoplayMode') === 'continuous';
+          document.getElementById('autoplayModeRow').style.display = autoplayOn ? 'block' : 'none';
+          document.getElementById('autoplayDelayRow').style.display = (autoplayOn && !isContinuous) ? 'block' : 'none';
+          document.getElementById('slidesPerGroupRow').style.display = (autoplayOn && !isContinuous) ? 'block' : 'none';
           document.getElementById('pauseOnHoverRow').style.display = autoplayOn ? 'flex' : 'none';
 
           // Card border sub-options
@@ -880,6 +909,11 @@
 
           // Mutual exclusion: quoteIcon vs starRating
           // Handled in event listeners below
+
+          // Colorful palette group
+          const isColorful = val('layout') === 'colorful';
+          document.getElementById('colorfulPaletteGroup').style.display = isColorful ? 'block' : 'none';
+          if (isColorful) buildColorSwatches();
 
           // Position conflict logic
           updatePositionDropdowns();
@@ -917,6 +951,31 @@
           }
         }
 
+        function buildColorSwatches() {
+          const container = document.getElementById('colorSwatches');
+          const count = Math.max(2, Math.min(12, num('colorCount')));
+          const existing = container.querySelectorAll('input[type="color"]');
+          const currentColors = Array.from(existing).map(el => el.value);
+          container.innerHTML = '';
+          for (let i = 0; i < count; i++) {
+            const color = currentColors[i] || COLORFUL_PALETTE[i % COLORFUL_PALETTE.length] || '#cccccc';
+            const swatch = document.createElement('div');
+            swatch.style.cssText = 'display:flex; flex-direction:column; align-items:center; gap:4px;';
+            swatch.innerHTML = `<input type="color" id="paletteColor${i}" value="${color}" oninput="updateAll()" style="width:36px;height:36px;border:none;padding:0;cursor:pointer;border-radius:6px;"><span style="font-size:11px;opacity:0.6;">${i + 1}</span>`;
+            container.appendChild(swatch);
+          }
+        }
+
+        function getColorPalette() {
+          const count = Math.max(2, Math.min(12, num('colorCount')));
+          const colors = [];
+          for (let i = 0; i < count; i++) {
+            const el = document.getElementById('paletteColor' + i);
+            colors.push(el ? el.value : COLORFUL_PALETTE[i % COLORFUL_PALETTE.length]);
+          }
+          return colors;
+        }
+
         /* ----------------------------- mutual exclusion -------------------- */
         document.getElementById('quoteIcon').addEventListener('change', function() {
           if (this.checked) document.getElementById('starRating').checked = false;
@@ -937,36 +996,48 @@
           const addProp = (cond, key, value) => { if (cond) props.push({ key, value }); };
 
           addProp(c.layout !== DEFAULTS.layout, 'layout', `'${c.layout}'`);
-          addProp(c.spvSm !== DEFAULTS.spvSm, 'slidesPerViewMobile', c.spvSm);
-          addProp(c.spvMd !== DEFAULTS.spvMd, 'slidesPerViewTablet', c.spvMd);
+          addProp(c.spvSm !== DEFAULTS.spvSm, 'mobileSlides', c.spvSm);
+          addProp(c.spvMd !== DEFAULTS.spvMd, 'tabletSlides', c.spvMd);
           addProp(c.spvLg !== DEFAULTS.spvLg, 'slidesPerView', c.spvLg);
           addProp(c.spaceBetween !== DEFAULTS.spaceBetween, 'spaceBetween', c.spaceBetween);
           addProp(c.speed !== DEFAULTS.speed, 'speed', c.speed);
           addProp(c.loop !== DEFAULTS.loop, 'loop', c.loop);
-          addProp(c.overflowVisible !== DEFAULTS.overflowVisible, 'overflowVisible', c.overflowVisible);
+          addProp(c.overflowVisible !== DEFAULTS.overflowVisible, 'overflow', c.overflowVisible);
           addProp(c.autoplay !== DEFAULTS.autoplay, 'autoplay', c.autoplay);
-          addProp(c.autoplay && c.autoplayDelay !== DEFAULTS.autoplayDelay, 'autoplayDelay', c.autoplayDelay);
+          addProp(c.autoplay && c.autoplayMode !== DEFAULTS.autoplayMode, 'autoplayMode', `'${c.autoplayMode}'`);
+          addProp(c.autoplay && c.autoplayMode !== 'continuous' && c.autoplayDelay !== DEFAULTS.autoplayDelay, 'autoplayDelay', c.autoplayDelay);
+          addProp(c.autoplay && c.autoplayMode !== 'continuous' && c.slidesPerGroup !== DEFAULTS.slidesPerGroup, 'slidesPerGroup', c.slidesPerGroup);
           addProp(c.autoplay && c.pauseOnHover !== DEFAULTS.pauseOnHover, 'pauseOnHover', c.pauseOnHover);
           addProp(c.arrows !== DEFAULTS.arrows, 'arrows', c.arrows);
           addProp(c.arrows && c.arrowStyle !== DEFAULTS.arrowStyle, 'arrowStyle', `'${c.arrowStyle}'`);
-          addProp(c.arrows && c.arrowStyle === 'text' && c.prevText !== DEFAULTS.prevText, 'prevText', `'${c.prevText}'`);
-          addProp(c.arrows && c.arrowStyle === 'text' && c.nextText !== DEFAULTS.nextText, 'nextText', `'${c.nextText}'`);
+          addProp(c.arrows && c.arrowStyle === 'text' && c.prevText !== DEFAULTS.prevText, 'arrowPrevText', `'${c.prevText}'`);
+          addProp(c.arrows && c.arrowStyle === 'text' && c.nextText !== DEFAULTS.nextText, 'arrowNextText', `'${c.nextText}'`);
           addProp(c.arrows && c.arrowsPosition !== DEFAULTS.arrowsPosition, 'arrowsPosition', `'${c.arrowsPosition}'`);
           addProp(c.dots !== DEFAULTS.dots, 'dots', c.dots);
           addProp(c.dots && c.dotsPosition !== DEFAULTS.dotsPosition, 'dotsPosition', `'${c.dotsPosition}'`);
           addProp(c.counter !== DEFAULTS.counter, 'counter', c.counter);
           addProp(c.counter && c.counterPosition !== DEFAULTS.counterPosition, 'counterPosition', `'${c.counterPosition}'`);
           addProp(c.cardBorder !== DEFAULTS.cardBorder, 'cardBorder', c.cardBorder);
-          addProp(c.cardBorder && c.borderWidth !== DEFAULTS.borderWidth, 'borderWidth', c.borderWidth);
-          addProp(c.cardBorder && c.borderColor !== DEFAULTS.borderColor, 'borderColor', `'${c.borderColor}'`);
-          addProp(c.borderRadius !== DEFAULTS.borderRadius, 'borderRadius', c.borderRadius);
+          addProp(c.cardBorder && c.borderWidth !== DEFAULTS.borderWidth, 'cardBorderWidth', c.borderWidth);
+          addProp(c.cardBorder && c.borderColor !== DEFAULTS.borderColor, 'cardBorderColor', `'${c.borderColor}'`);
+          addProp(c.borderRadius !== DEFAULTS.borderRadius, 'cardBorderRadius', c.borderRadius);
           addProp(c.cardBgTransparent, 'cardBackground', `'transparent'`);
           addProp(!c.cardBgTransparent && c.cardBg !== DEFAULTS.cardBg, 'cardBackground', `'${c.cardBg}'`);
           addProp(c.cardPadding !== DEFAULTS.cardPadding, 'cardPadding', c.cardPadding);
-          addProp(c.quoteIcon !== DEFAULTS.quoteIcon, 'quoteIcon', c.quoteIcon);
-          addProp(c.starRating !== DEFAULTS.starRating, 'starRating', c.starRating);
+          addProp(c.quoteIcon !== DEFAULTS.quoteIcon, 'showQuoteIcon', c.quoteIcon);
+          addProp(c.starRating !== DEFAULTS.starRating, 'showStarRating', c.starRating);
           addProp(c.starRating && c.starCount !== DEFAULTS.starCount, 'starCount', c.starCount);
-          addProp(c.roleSource !== DEFAULTS.roleSource, 'roleSource', `'${c.roleSource}'`);
+          addProp(c.roleSource !== DEFAULTS.roleSource, 'roleField', `'${c.roleSource}'`);
+
+          // Colorful palette
+          if (c.layout === 'colorful') {
+            const palette = getColorPalette();
+            const defaultPalette = COLORFUL_PALETTE.slice(0, palette.length);
+            const changed = palette.length !== COLORFUL_PALETTE.length || palette.some((c, i) => c !== defaultPalette[i]);
+            if (changed) {
+              addProp(true, 'colorPalette', '[' + palette.map(c => `'${c}'`).join(', ') + ']');
+            }
+          }
 
           let configBlock = '';
           if (props.length > 0) {
