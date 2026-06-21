@@ -8846,13 +8846,15 @@
       };
     }
 
-    // Overflow — use fractional slidesPerView so Swiper always shows a partial next slide
-    if (settings.overflow) {
+    // Overflow — add fractional peek to whatever slidesPerView layout set
+    if (settings.overflow && settings.layout !== 'tilted') {
       var peek = 0.15;
-      config.slidesPerView = settings.slidesPerView + peek;
-      config.breakpoints[0].slidesPerView = Math.max(1, settings.mobileSlides + peek);
-      config.breakpoints[768].slidesPerView = settings.tabletSlides + peek;
-      config.breakpoints[1024].slidesPerView = settings.slidesPerView + peek;
+      config.slidesPerView = (config.slidesPerView || settings.slidesPerView) + peek;
+      if (config.breakpoints) {
+        if (config.breakpoints[0]) config.breakpoints[0].slidesPerView = (config.breakpoints[0].slidesPerView || settings.mobileSlides) + peek;
+        if (config.breakpoints[768]) config.breakpoints[768].slidesPerView = (config.breakpoints[768].slidesPerView || settings.tabletSlides) + peek;
+        if (config.breakpoints[1024]) config.breakpoints[1024].slidesPerView = (config.breakpoints[1024].slidesPerView || settings.slidesPerView) + peek;
+      }
     }
 
     // Autoplay (non-continuous)
