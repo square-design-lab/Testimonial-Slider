@@ -60,6 +60,22 @@ section[id^="testimonial-slider"][data-sdl-ts-state="ready"] .summary-block-wrap
   overflow: visible;
 }
 
+.sdl-ts-overflow-peek {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  opacity: 0.5;
+}
+
+.sdl-ts-overflow-peek .swiper-slide {
+  width: 100% !important;
+  height: 100%;
+}
+
 .sdl-ts-wrapper.sdl-ts-continuous .swiper {
   overflow: hidden;
 }

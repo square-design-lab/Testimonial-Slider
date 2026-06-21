@@ -8201,6 +8201,20 @@
     '.' + CSS_PREFIX + 'wrapper.sdl-ts-overflow .swiper {' +
     '  overflow: visible;' +
     '}' +
+    '.' + CSS_PREFIX + 'overflow-peek {' +
+    '  position: absolute;' +
+    '  top: 0;' +
+    '  right: 0;' +
+    '  height: 100%;' +
+    '  pointer-events: none;' +
+    '  z-index: 0;' +
+    '  overflow: hidden;' +
+    '  opacity: 0.5;' +
+    '}' +
+    '.' + CSS_PREFIX + 'overflow-peek .swiper-slide {' +
+    '  width: 100% !important;' +
+    '  height: 100%;' +
+    '}' +
     '.' + CSS_PREFIX + 'wrapper.sdl-ts-continuous .swiper {' +
     '  overflow: hidden;' +
     '}' +
@@ -8649,6 +8663,16 @@
     });
 
     swiperEl.appendChild(swiperWrapper);
+
+    // Overflow peek: create right-side peek container
+    var peekRight = null;
+    if (settings.overflow) {
+      peekRight = document.createElement('div');
+      peekRight.className = CSS_PREFIX + 'overflow-peek';
+      peekRight.setAttribute('aria-hidden', 'true');
+      swiperEl.appendChild(peekRight);
+    }
+
     wrapper.appendChild(swiperEl);
 
     // Determine which nav positions are used (for wrapper padding)
@@ -8706,6 +8730,8 @@
       dotsEl: dotsEl,
       counterEl: counterEl,
       summaryBlock: summaryBlock,
+      peekRight: peekRight,
+      testimonials: testimonials,
     };
   }
 
@@ -8835,27 +8861,17 @@
     }
 
     if (settings.layout === 'tilted') {
-      var tp = settings.overflow ? 0.15 : 0;
-      config.slidesPerView = 4 + tp;
+      config.slidesPerView = 4;
       config.spaceBetween = -20;
       config.centeredSlides = true;
       config.breakpoints = {
-        0: { slidesPerView: 2 + tp, spaceBetween: -10 },
-        768: { slidesPerView: 3 + tp, spaceBetween: -15 },
-        1024: { slidesPerView: 4 + tp, spaceBetween: -20 },
+        0: { slidesPerView: 2, spaceBetween: -10 },
+        768: { slidesPerView: 3, spaceBetween: -15 },
+        1024: { slidesPerView: 4, spaceBetween: -20 },
       };
     }
 
-    // Overflow — add fractional peek to whatever slidesPerView layout set
-    if (settings.overflow && settings.layout !== 'tilted') {
-      var peek = 0.15;
-      config.slidesPerView = (config.slidesPerView || settings.slidesPerView) + peek;
-      if (config.breakpoints) {
-        if (config.breakpoints[0]) config.breakpoints[0].slidesPerView = (config.breakpoints[0].slidesPerView || settings.mobileSlides) + peek;
-        if (config.breakpoints[768]) config.breakpoints[768].slidesPerView = (config.breakpoints[768].slidesPerView || settings.tabletSlides) + peek;
-        if (config.breakpoints[1024]) config.breakpoints[1024].slidesPerView = (config.breakpoints[1024].slidesPerView || settings.slidesPerView) + peek;
-      }
-    }
+    // Overflow — no fractional slidesPerView needed; peek handled by DOM clone element
 
     // Autoplay (non-continuous)
     if (settings.autoplay && settings.autoplayMode !== 'continuous') {
@@ -8905,6 +8921,30 @@
     // Continuous marquee via CSS animation
     if (settings.autoplay && settings.autoplayMode === 'continuous') {
       initContinuousScroll(built, settings);
+    }
+
+    // Overflow peek: keep a right-side ghost showing the next slide
+    if (built.peekRight && settings.overflow) {
+      var updatePeek = function () {
+        var spv = Math.floor(swiper.params.slidesPerView);
+        var nextIdx = (swiper.realIndex + spv) % totalSlides;
+        var t = built.testimonials[nextIdx];
+        built.peekRight.innerHTML = '<div class="swiper-slide">' + buildSlideHTML(t, nextIdx, settings) + '</div>';
+
+        // Size the peek container based on actual slide width
+        var activeSlide = built.swiperEl.querySelector('.swiper-slide');
+        if (activeSlide) {
+          var slideW = activeSlide.offsetWidth;
+          var gap = settings.spaceBetween || 0;
+          built.peekRight.style.width = slideW + 'px';
+          built.peekRight.style.transform = 'translateX(calc(100% + ' + gap + 'px))';
+        }
+      };
+
+      swiper.on('slideChange', updatePeek);
+      swiper.on('resize', updatePeek);
+      // Initial update after layout settles
+      requestAnimationFrame(function () { updatePeek(); });
     }
 
     return swiper;
