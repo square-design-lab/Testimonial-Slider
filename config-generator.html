@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Testimonial Slider — Config Generator v1.0</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Real plugin stylesheet so the live preview matches production exactly -->
+    <link rel="stylesheet" href="testimonialSlider.css">
+
+    <style>
+        :root {
+            --bg-body: #F5F5F7;
+            --bg-sidebar: #FFFFFF;
+            --text-main: #1C1C1E;
+            --text-secondary: #666666;
+            --text-tertiary: #999999;
+            --border-light: #E5E5E5;
+            --border-hover: #D4D4D4;
+            --border-active: #18181B;
+            --accent: #18181B;
+            --accent-hover: #09090B;
+            --accent-contrast: #FFFFFF;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            --shadow-lg: 0 20px 40px -12px rgba(0,0,0,0.12);
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --sidebar-width: 380px;
+            --header-height: 60px;
+        }
+
+        * { box-sizing: border-box; outline: none; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            margin: 0; padding: 0;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+            font-size: 13px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            z-index: 20;
+        }
+        .sidebar-header {
+            height: var(--header-height);
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(10px);
+        }
+        .sidebar-header h2 {
+            font-size: 15px; font-weight: 700; margin: 0;
+            display: flex; align-items: center; gap: 10px;
+            letter-spacing: -0.02em;
+        }
+        .brand-icon {
+            width: 30px; height: 30px;
+            background: var(--accent); color: #fff;
+            border-radius: 8px;
+            display: inline-flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .sidebar-header .badge {
+            font-size: 10px; background: #F4F4F5;
+            padding: 2px 7px; border-radius: 4px;
+            color: #52525B; font-weight: 600;
+            border: 1px solid #D4D4D8;
+        }
+        .sidebar-content { flex: 1; overflow-y: auto; padding: 24px; }
+        .sidebar-content::-webkit-scrollbar { width: 6px; }
+        .sidebar-content::-webkit-scrollbar-thumb { background: #E5E5E5; border-radius: 3px; }
+        .sidebar-content::-webkit-scrollbar-thumb:hover { background: #D4D4D4; }
+
+        .group { margin-bottom: 18px; border-bottom: 1px solid var(--border-light); padding-bottom: 18px; }
+        .group:last-child { border-bottom: none; }
+        .group-header {
+            font-size: 12px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.07em;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: space-between;
+            transition: color 0.2s;
+        }
+        .group-header:hover { color: var(--text-main); }
+        .group-header::after {
+            content: ''; width: 6px; height: 6px;
+            border-right: 1.5px solid currentColor;
+            border-bottom: 1.5px solid currentColor;
+            transform: rotate(45deg);
+            transition: transform 0.2s; margin-right: 4px;
+        }
+        .group.open .group-header::after { transform: rotate(-135deg); }
+        .group-body { display: none; padding-top: 14px; }
+        .group.open .group-body { display: block; animation: slideIn 0.2s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .control-row { margin-bottom: 14px; }
+        label {
+            display: block; font-size: 13px; font-weight: 500;
+            margin-bottom: 6px; color: var(--text-main);
+        }
+        .helper-text { font-size: 11px; color: var(--text-secondary); margin-top: 6px; line-height: 1.4; }
+
+        input[type="text"], input[type="number"], select {
+            width: 100%; height: 36px; padding: 0 10px;
+            font-family: inherit; font-size: 13px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            background: #fff; color: var(--text-main);
+            transition: all 0.15s; appearance: none;
+        }
+        input:hover, select:hover { border-color: var(--border-hover); }
+        input:focus, select:focus { border-color: var(--border-active); box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
+        select {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat; background-position: right 8px center;
+            background-size: 14px; padding-right: 30px;
+        }
+        select option:disabled { color: #ccc; }
+        .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .grid2 label, .grid3 label { font-size: 12px; }
+
+        .toggle-row {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 12px; min-height: 24px;
+        }
+        .toggle-row label { margin: 0; font-weight: 400; color: var(--text-secondary); }
+
+        input[type="checkbox"] {
+            appearance: none; width: 36px; height: 20px;
+            background: #E5E5E5; border-radius: 20px;
+            position: relative; cursor: pointer; transition: 0.2s; border: none; flex-shrink: 0;
+        }
+        input[type="checkbox"]::after {
+            content: ''; position: absolute; top: 2px; left: 2px;
+            width: 16px; height: 16px; background: #fff; border-radius: 50%;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            transition: 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        input[type="checkbox"]:checked { background: var(--accent); }
+        input[type="checkbox"]:checked::after { transform: translateX(16px); }
+
+        .color-row {
+            display: flex; flex-direction: column; gap: 10px;
+            background: #FAFAFA; padding: 12px;
+            border-radius: var(--radius-md); border: 1px solid var(--border-light);
+        }
+        .color-chip { display: flex; align-items: center; justify-content: space-between; }
+        .color-chip .color-label { font-size: 12px; font-weight: 500; }
+        input[type="color"] {
+            width: 28px; height: 28px; padding: 0;
+            border: 1.5px solid #B8B8B8; border-radius: 50%;
+            overflow: hidden; cursor: pointer; background: none;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { flex: 1; display: flex; flex-direction: column; background: var(--bg-body); position: relative; }
+        .topbar {
+            height: var(--header-height); padding: 0 24px;
+            border-bottom: 1px solid var(--border-light); background: #fff;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .device-toggle { background: #F2F2F2; padding: 2px; border-radius: 6px; display: flex; }
+        .device-toggle button {
+            border: none; background: transparent; padding: 6px 12px;
+            font-size: 12px; font-weight: 500; color: var(--text-secondary);
+            cursor: pointer; border-radius: 4px; transition: 0.2s; font-family: inherit;
+        }
+        .device-toggle button.active { background: #fff; color: var(--text-main); box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+
+        .copy-btn {
+            background: var(--accent); color: var(--accent-contrast);
+            border: none; padding: 9px 20px; border-radius: 7px;
+            font-weight: 600; font-size: 13px; letter-spacing: -0.01em;
+            cursor: pointer; display: flex; align-items: center; gap: 7px;
+            transition: transform 0.1s, background 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.18); font-family: inherit;
+        }
+        .copy-btn:hover { background: var(--accent-hover); }
+        .copy-btn:active { transform: scale(0.97); }
+        .copy-btn.copied { background: #0EA5E9; box-shadow: 0 1px 3px rgba(14,165,233,0.3); }
+
+        .preview-container {
+            flex: 1; overflow-y: auto; padding: 40px;
+            display: flex; justify-content: center; align-items: flex-start;
+            background-image: radial-gradient(#E1E1E1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        #previewFrame {
+            background: #fff; width: 100%; max-width: 1100px; min-height: 460px;
+            box-shadow: var(--shadow-lg); border-radius: var(--radius-lg);
+            padding: 40px;
+            transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex; flex-direction: column; justify-content: center;
+            border: 1px solid var(--border-light);
+        }
+        #previewFrame.mobile { width: 390px; padding: 20px; border-radius: 30px; border: 8px solid #333; }
+
+        .code-drawer {
+            height: 250px; background: #0D0D0D; color: #E1E1E1;
+            display: flex; flex-direction: column;
+            border-top: 1px solid var(--border-light);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .drawer-header {
+            padding: 10px 24px; background: #1A1A1A; border-bottom: 1px solid #333;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .drawer-header h3 { margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #888; }
+        #codeOutput { flex: 1; padding: 24px; margin: 0; overflow: auto; font-size: 12px; line-height: 1.6; color: #A9B7C6; white-space: pre-wrap; }
+        #codeOutput .hl-key  { color: #E5BF78; }
+        #codeOutput .hl-str  { color: #87C98F; }
+        #codeOutput .hl-bool { color: #79B8FF; }
+        #codeOutput .hl-num  { color: #FF9D7C; }
+        #codeOutput .hl-tag  { color: #6B8CAE; }
+        #codeOutput .hl-attr { color: #E5BF78; }
+
+        .mobile-tabs { display: none; }
+        .mobile-copy-btn { display: none; }
+
+        @media (max-width: 1023px) {
+            body { flex-direction: column; height: 100vh; overflow: hidden; }
+            .main-content { display: none; }
+            .sidebar {
+                position: fixed; top: 0; left: 0; right: 0;
+                bottom: calc(68px + env(safe-area-inset-bottom));
+                width: 100%; border-right: none; display: none;
+                flex-direction: column; z-index: 50;
+            }
+            .sidebar-header { flex-shrink: 0; }
+            .mobile-tabs {
+                display: flex; position: fixed; bottom: 0; left: 0; right: 0;
+                background: #fff; border-top: 1px solid #E5E5E5; z-index: 100;
+                height: 68px; padding: 8px 12px;
+                padding-bottom: calc(8px + env(safe-area-inset-bottom));
+                gap: 6px; align-items: stretch;
+            }
+            .tab-btn {
+                flex: 1; border: none; background: transparent; color: var(--text-tertiary);
+                font-size: 11px; font-weight: 500; font-family: inherit; cursor: pointer;
+                border-radius: 10px; display: flex; flex-direction: column;
+                align-items: center; justify-content: center; gap: 4px;
+                transition: background 0.18s ease, color 0.18s ease;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .tab-btn svg { opacity: 0.5; transition: opacity 0.18s ease; }
+            .tab-btn.active { background: var(--accent); color: #fff; font-weight: 600; }
+            .tab-btn.active svg { opacity: 1; }
+            .mobile-copy-btn { display: flex; }
+            body.tab-edit .sidebar { display: flex; }
+            body.tab-preview .sidebar { display: none; }
+            body.tab-preview .main-content {
+                display: flex; position: fixed; top: 0; left: 0; right: 0;
+                bottom: calc(68px + env(safe-area-inset-bottom)); height: auto;
+            }
+            body.tab-preview .code-drawer { display: none; }
+            body.tab-code .sidebar { display: none; }
+            body.tab-code .main-content {
+                display: flex; position: fixed; top: 0; left: 0; right: 0;
+                bottom: calc(68px + env(safe-area-inset-bottom)); height: auto;
+            }
+            body.tab-code .preview-container { display: none; }
+            body.tab-code .code-drawer { flex: 1; height: auto; }
+        }
+
+        /* -------------------------------------------------------------
+           PREVIEW-ONLY overrides: mock slider with CSS scroll snap
+        ------------------------------------------------------------- */
+        #previewHost { width: 100%; }
+        #previewHost .swiper { overflow: hidden; }
+        #previewHost .swiper-wrapper {
+            display: flex;
+            overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth;
+            -ms-overflow-style: none; scrollbar-width: none; transition: none;
+        }
+        #previewHost .swiper-wrapper::-webkit-scrollbar { display: none; }
+        #previewHost .swiper-slide { scroll-snap-align: start; flex-shrink: 0; height: auto; }
+
+        /* Preview testimonial card styles */
+        .pv-card {
+            padding: 32px;
+            display: flex; flex-direction: column; gap: 16px;
+            height: 100%;
+        }
+        .pv-card-header { display: flex; align-items: center; gap: 14px; }
+        .pv-avatar {
+            width: 48px; height: 48px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 600; font-size: 15px; color: #fff; flex-shrink: 0;
+            letter-spacing: 0.02em;
+        }
+        .pv-author-info { display: flex; flex-direction: column; gap: 2px; }
+        .pv-name { font-weight: 600; font-size: 14px; color: var(--text-main); }
+        .pv-role { font-size: 12px; color: var(--text-secondary); }
+        .pv-quote { font-size: 14px; line-height: 1.65; color: var(--text-secondary); flex: 1; }
+        .pv-quote-icon { color: var(--text-tertiary); opacity: 0.3; }
+        .pv-stars { display: flex; gap: 2px; }
+        .pv-star { color: #FBBF24; font-size: 16px; }
+
+        /* Layout: spotlight */
+        .layout-spotlight .pv-card { text-align: center; align-items: center; padding: 48px 40px; }
+        .layout-spotlight .pv-card-header { flex-direction: column; gap: 10px; }
+        .layout-spotlight .pv-author-info { align-items: center; }
+        .layout-spotlight .pv-avatar { width: 64px; height: 64px; font-size: 20px; }
+        .layout-spotlight .pv-quote { font-size: 18px; max-width: 600px; }
+
+        /* Layout: minimal */
+        .layout-minimal .pv-card { padding: 24px 0; border: none !important; background: transparent !important; border-radius: 0 !important; }
+        .layout-minimal .pv-card-header { order: 2; }
+        .layout-minimal .pv-quote { order: 1; font-size: 16px; font-style: italic; }
+
+        /* Layout: magazine */
+        .layout-magazine .pv-card { padding: 40px 32px; }
+        .layout-magazine .pv-quote { font-size: 16px; font-weight: 500; color: var(--text-main); line-height: 1.7; border-left: 3px solid var(--text-main); padding-left: 20px; }
+        .layout-magazine .pv-card-header { order: 2; }
+
+        /* Layout: colorful */
+        .layout-colorful .pv-card { border: none !important; }
+        .layout-colorful .pv-quote { font-size: 14px; color: #000; font-weight: 400; }
+        .layout-colorful .pv-name { color: #000; font-weight: 700; font-size: 15px; }
+        .layout-colorful .pv-role { color: rgba(0,0,0,0.65); }
+        .layout-colorful .pv-card-header { order: 2; }
+        .layout-colorful .pv-quote-icon { display: none; }
+
+        /* Layout: review */
+        .layout-review .pv-card { border: none !important; }
+        .layout-review .pv-quote { color: inherit; font-size: 13px; }
+        .layout-review .pv-name { color: inherit; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.05em; font-size: 11px; }
+        .layout-review .pv-role { color: inherit; opacity: 0.7; font-size: 11px; text-transform: lowercase; }
+        .layout-review .pv-card-header { order: 2; flex-direction: column; gap: 0; align-items: flex-start; }
+        .layout-review .pv-avatar { display: none; }
+        .layout-review .pv-quote-icon { display: none; }
+        .layout-review .pv-review-tag { font-size: 11px; opacity: 0.7; text-transform: lowercase; order: -1; }
+
+        /* Layout: tilted */
+        .layout-tilted .pv-card { border: none !important; color: #fff; text-align: center; align-items: center; border-radius: 16px !important; padding: 28px 22px; }
+        .layout-tilted .pv-quote { color: #fff; font-size: 13px; }
+        .layout-tilted .pv-name { color: #fff; }
+        .layout-tilted .pv-role { color: rgba(255,255,255,0.7); }
+        .layout-tilted .pv-card-header { flex-direction: column; gap: 4px; order: 2; }
+        .layout-tilted .pv-avatar { display: none; }
+        .layout-tilted .pv-quote-icon svg { fill: #fff !important; opacity: 0.3; }
+        .layout-tilted .pv-tilted-divider { width: 40px; height: 2px; background: rgba(255,255,255,0.4); margin: 4px 0; order: 1; }
+
+        /* Navigation elements in preview */
+        .pv-nav-wrapper {
+            display: flex; align-items: center; gap: 12px;
+            position: absolute; z-index: 5;
+        }
+        .pv-nav-wrapper.pos-bottom-center { bottom: -40px; left: 50%; transform: translateX(-50%); }
+        .pv-nav-wrapper.pos-bottom-left { bottom: -40px; left: 0; }
+        .pv-nav-wrapper.pos-bottom-right { bottom: -40px; right: 0; }
+        .pv-nav-wrapper.pos-top-center { top: -40px; left: 50%; transform: translateX(-50%); }
+        .pv-nav-wrapper.pos-top-left { top: -40px; left: 0; }
+        .pv-nav-wrapper.pos-top-right { top: -40px; right: 0; }
+
+        .pv-arrow-btn {
+            width: 34px; height: 34px; border-radius: 50%;
+            border: 1px solid var(--border-light); background: #fff;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: 0.15s; color: var(--text-main);
+        }
+        .pv-arrow-btn:hover { border-color: var(--border-active); }
+        .pv-arrow-text {
+            border: 1px solid var(--border-light); background: #fff;
+            padding: 6px 14px; border-radius: 6px; cursor: pointer;
+            font-size: 12px; font-weight: 500; font-family: inherit;
+            transition: 0.15s; color: var(--text-main);
+        }
+        .pv-arrow-text:hover { border-color: var(--border-active); }
+
+        .pv-dots { display: flex; gap: 6px; align-items: center; }
+        .pv-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #ccc; border: none; cursor: pointer; padding: 0;
+            transition: 0.15s;
+        }
+        .pv-dot.active { background: var(--text-main); }
+        .pv-counter { font-size: 12px; color: var(--text-secondary); font-weight: 500; white-space: nowrap; }
+
+        #previewHost { position: relative; padding-bottom: 50px; padding-top: 50px; }
+    </style>
+</head>
+<body class="tab-edit">
+
+    <div class="mobile-tabs">
+        <button class="tab-btn active" onclick="setTab('edit')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Settings
+        </button>
+        <button class="tab-btn" onclick="setTab('preview')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            Preview
+        </button>
+        <button class="tab-btn" onclick="setTab('code')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Code
+        </button>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>
+                <span class="brand-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8"/><path d="M8 13h4"/></svg>
+                </span>
+                Testimonial Slider <span class="badge">v1.0</span>
+            </h2>
+            <button class="copy-btn mobile-copy-btn" id="mobileCopyBtn" onclick="copyCode()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                Copy
+            </button>
+        </div>
+        <div class="sidebar-content">
+
+            <!-- LAYOUT -->
+            <div class="group open">
+                <div class="group-header" onclick="togGroup(this)">Layout</div>
+                <div class="group-body">
+                    <div class="control-row">
+                        <label>Layout</label>
+                        <select id="layout">
+                            <option value="cards" selected>Cards</option>
+                            <option value="spotlight">Spotlight</option>
+                            <option value="minimal">Minimal</option>
+                            <option value="magazine">Magazine</option>
+                            <option value="colorful">Colorful</option>
+                            <option value="review">Review</option>
+                            <option value="tilted">Tilted</option>
+                        </select>
+                        <div class="helper-text"><strong>Cards</strong> — bordered grid. <strong>Spotlight</strong> — centered single focus. <strong>Minimal</strong> — clean text-first. <strong>Magazine</strong> — editorial accent. <strong>Colorful</strong> — rotating color backgrounds. <strong>Review</strong> — dark cards with stars. <strong>Tilted</strong> — rotated overlapping cards.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDES -->
+            <div class="group open">
+                <div class="group-header" onclick="togGroup(this)">Slides</div>
+                <div class="group-body">
+                    <label>Slides Per View</label>
+                    <div class="control-row grid3">
+                        <div><label>Mobile</label><input type="number" id="spvSm" value="1" min="1"></div>
+                        <div><label>Tablet</label><input type="number" id="spvMd" value="2" min="1"></div>
+                        <div><label>Desktop</label><input type="number" id="spvLg" value="3" min="1"></div>
+                    </div>
+                    <div class="control-row">
+                        <label>Space Between (px)</label>
+                        <input type="number" id="spaceBetween" value="24" min="0">
+                    </div>
+                    <div class="control-row">
+                        <label>Transition Speed (ms)</label>
+                        <input type="number" id="speed" value="500" min="0">
+                    </div>
+                    <div class="toggle-row"><label>Loop</label><input type="checkbox" id="loop" checked></div>
+                    <div class="toggle-row"><label>Overflow Visible</label><input type="checkbox" id="overflowVisible"></div>
+                </div>
+            </div>
+
+            <!-- AUTOPLAY -->
+            <div class="group">
+                <div class="group-header" onclick="togGroup(this)">Autoplay</div>
+                <div class="group-body">
+                    <div class="toggle-row"><label>Autoplay</label><input type="checkbox" id="autoplay"></div>
+                    <div class="control-row" id="autoplayDelayRow" style="display:none;">
+                        <label>Autoplay Delay (ms)</label>
+                        <input type="number" id="autoplayDelay" value="5000" min="500">
+                    </div>
+                    <div class="toggle-row" id="pauseOnHoverRow" style="display:none;"><label>Pause on Hover</label><input type="checkbox" id="pauseOnHover" checked></div>
+                </div>
+            </div>
+
+            <!-- NAVIGATION -->
+            <div class="group">
+                <div class="group-header" onclick="togGroup(this)">Navigation</div>
+                <div class="group-body">
+                    <div class="toggle-row"><label>Show Arrows</label><input type="checkbox" id="arrows" checked></div>
+                    <div class="control-row" id="arrowStyleRow">
+                        <label>Arrow Style</label>
+                        <select id="arrowStyle">
+                            <option value="icon" selected>Icon</option>
+                            <option value="text">Text</option>
+                        </select>
+                    </div>
+                    <div class="control-row" id="prevTextRow" style="display:none;">
+                        <label>Prev Text</label>
+                        <input type="text" id="prevText" value="Prev">
+                    </div>
+                    <div class="control-row" id="nextTextRow" style="display:none;">
+                        <label>Next Text</label>
+                        <input type="text" id="nextText" value="Next">
+                    </div>
+                    <div class="control-row" id="arrowsPosRow">
+                        <label>Arrows Position</label>
+                        <select id="arrowsPosition">
+                            <option value="bottom-center" selected>Bottom Center</option>
+                            <option value="bottom-left">Bottom Left</option>
+                            <option value="bottom-right">Bottom Right</option>
+                            <option value="top-center">Top Center</option>
+                            <option value="top-left">Top Left</option>
+                            <option value="top-right">Top Right</option>
+                        </select>
+                    </div>
+                    <div class="toggle-row"><label>Show Dots</label><input type="checkbox" id="dots"></div>
+                    <div class="control-row" id="dotsPosRow" style="display:none;">
+                        <label>Dots Position</label>
+                        <select id="dotsPosition">
+                            <option value="bottom-center" selected>Bottom Center</option>
+                            <option value="bottom-left">Bottom Left</option>
+                            <option value="bottom-right">Bottom Right</option>
+                            <option value="top-center">Top Center</option>
+                            <option value="top-left">Top Left</option>
+                            <option value="top-right">Top Right</option>
+                        </select>
+                    </div>
+                    <div class="toggle-row"><label>Show Counter</label><input type="checkbox" id="counter"></div>
+                    <div class="control-row" id="counterPosRow" style="display:none;">
+                        <label>Counter Position</label>
+                        <select id="counterPosition">
+                            <option value="bottom-center" selected>Bottom Center</option>
+                            <option value="bottom-left">Bottom Left</option>
+                            <option value="bottom-right">Bottom Right</option>
+                            <option value="top-center">Top Center</option>
+                            <option value="top-left">Top Left</option>
+                            <option value="top-right">Top Right</option>
+                        </select>
+                    </div>
+                    <div class="helper-text" id="posConflictHelper" style="display:none;">Positions already used by another navigation element are disabled.</div>
+                </div>
+            </div>
+
+            <!-- CARD STYLING -->
+            <div class="group">
+                <div class="group-header" onclick="togGroup(this)">Card Styling</div>
+                <div class="group-body">
+                    <div class="toggle-row"><label>Card Border</label><input type="checkbox" id="cardBorder" checked></div>
+                    <div id="borderWidthRow" class="control-row">
+                        <label>Border Width (px)</label>
+                        <input type="number" id="borderWidth" value="1" min="0">
+                    </div>
+                    <div id="borderColorRow" class="color-row" style="margin-bottom:14px;">
+                        <div class="color-chip"><span class="color-label">Border Color</span><input type="color" id="borderColor" value="#e5e5e5"></div>
+                    </div>
+                    <div class="control-row">
+                        <label>Border Radius (px)</label>
+                        <input type="number" id="borderRadius" value="12" min="0">
+                    </div>
+                    <div class="color-row" style="margin-bottom:14px;">
+                        <div class="color-chip"><span class="color-label">Card Background</span><input type="color" id="cardBg" value="#ffffff"></div>
+                    </div>
+                    <div class="toggle-row"><label>Transparent Background</label><input type="checkbox" id="cardBgTransparent"></div>
+                    <div class="control-row">
+                        <label>Card Padding (px)</label>
+                        <input type="number" id="cardPadding" value="32" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- DECORATIONS -->
+            <div class="group">
+                <div class="group-header" onclick="togGroup(this)">Decorations</div>
+                <div class="group-body">
+                    <div class="toggle-row"><label>Show Quote Icon</label><input type="checkbox" id="quoteIcon" checked></div>
+                    <div class="toggle-row"><label>Show Star Rating</label><input type="checkbox" id="starRating"></div>
+                    <div class="control-row" id="starCountRow" style="display:none;">
+                        <label>Star Count</label>
+                        <input type="number" id="starCount" value="5" min="1" max="5">
+                    </div>
+                    <div class="helper-text">Quote icon and star rating are mutually exclusive. Enabling one disables the other.</div>
+                </div>
+            </div>
+
+            <!-- CONTENT MAPPING -->
+            <div class="group">
+                <div class="group-header" onclick="togGroup(this)">Content Mapping</div>
+                <div class="group-body">
+                    <div class="control-row">
+                        <label>Role Source</label>
+                        <select id="roleSource">
+                            <option value="categories" selected>Categories</option>
+                            <option value="tags">Tags</option>
+                        </select>
+                        <div class="helper-text">Where to pull the role/company text from in your Summary Block.</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div class="device-toggle">
+                <button id="desktopToggle" class="active" onclick="setDev('desktop')">Desktop</button>
+                <button id="mobileToggle" onclick="setDev('mobile')">Mobile</button>
+            </div>
+            <button class="copy-btn" id="copyBtn" onclick="copyCode()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                Copy Code
+            </button>
+        </div>
+
+        <div class="preview-container">
+            <div id="previewFrame"></div>
+        </div>
+
+        <div class="code-drawer">
+            <div class="drawer-header"><h3>Installation Code</h3></div>
+            <pre id="codeOutput"></pre>
+        </div>
+    </div>
+
+    <script>
+      try {
+        /* ----------------------------- defaults ----------------------------- */
+        const DEFAULTS = {
+          layout: 'cards',
+          spvSm: 1, spvMd: 2, spvLg: 3,
+          spaceBetween: 24, speed: 500,
+          loop: true, overflowVisible: false,
+          autoplay: false, autoplayDelay: 5000, pauseOnHover: true,
+          arrows: true, arrowStyle: 'icon', prevText: 'Prev', nextText: 'Next',
+          arrowsPosition: 'bottom-center',
+          dots: false, dotsPosition: 'bottom-center',
+          counter: false, counterPosition: 'bottom-center',
+          cardBorder: true, borderWidth: 1, borderColor: '#e5e5e5',
+          borderRadius: 12, cardBg: '#ffffff', cardBgTransparent: false, cardPadding: 32,
+          quoteIcon: true, starRating: false, starCount: 5,
+          roleSource: 'categories'
+        };
+
+        const COLORFUL_PALETTE = ['#FFF3B0', '#FFB3D9', '#B3FFB3', '#B3D9FF', '#FFD9B3', '#D9B3FF'];
+        const TILT_PALETTE = ['#2d4a9e', '#e85d3a', '#1a7a5a', '#e85d3a', '#2d4a9e', '#1a7a5a'];
+
+        const val = id => document.getElementById(id).value;
+        const num = id => parseFloat(document.getElementById(id).value) || 0;
+        const chk = id => document.getElementById(id).checked;
+
+        /* ----------------------------- mock data ---------------------------- */
+        const SAMPLE_TESTIMONIALS = [
+          { name: 'Sarah Johnson', role: 'CEO, TechCorp', quote: 'This product completely transformed how we handle our workflow. The team adoption was seamless and the results speak for themselves.', image: '' },
+          { name: 'Michael Chen', role: 'Design Director', quote: 'The attention to detail is remarkable. Every feature feels thoughtfully crafted and the support team is incredibly responsive.', image: '' },
+          { name: 'Emily Rodriguez', role: 'Marketing Lead', quote: 'We saw a 40% increase in engagement within the first month. The analytics dashboard alone is worth the investment.', image: '' },
+          { name: 'David Kim', role: 'CTO, StartupXYZ', quote: 'Finally, a solution that scales with our needs. The API integration was straightforward and documentation is excellent.', image: '' },
+          { name: 'Lisa Park', role: 'Product Manager', quote: 'The best tool we have added to our stack this year. Clean interface, powerful features, and excellent value.', image: '' },
+          { name: 'James Wilson', role: 'Founder, Creative Co', quote: 'Outstanding quality and reliability. Our clients love the results and we love how easy it is to deliver them.', image: '' },
+        ];
+
+        const AVATAR_COLORS = ['#6366F1','#EC4899','#10B981','#F59E0B','#3B82F6','#EF4444'];
+
+        function getInitials(name) {
+          return name.split(' ').map(w => w[0]).join('').toUpperCase();
+        }
+
+        /* ----------------------------- read config -------------------------- */
+        function readConfig() {
+          return {
+            layout: val('layout'),
+            spvSm: num('spvSm'), spvMd: num('spvMd'), spvLg: num('spvLg'),
+            spaceBetween: num('spaceBetween'), speed: num('speed'),
+            loop: chk('loop'), overflowVisible: chk('overflowVisible'),
+            autoplay: chk('autoplay'), autoplayDelay: num('autoplayDelay'), pauseOnHover: chk('pauseOnHover'),
+            arrows: chk('arrows'), arrowStyle: val('arrowStyle'),
+            prevText: val('prevText'), nextText: val('nextText'),
+            arrowsPosition: val('arrowsPosition'),
+            dots: chk('dots'), dotsPosition: val('dotsPosition'),
+            counter: chk('counter'), counterPosition: val('counterPosition'),
+            cardBorder: chk('cardBorder'), borderWidth: num('borderWidth'),
+            borderColor: val('borderColor'),
+            borderRadius: num('borderRadius'),
+            cardBg: val('cardBg'), cardBgTransparent: chk('cardBgTransparent'),
+            cardPadding: num('cardPadding'),
+            quoteIcon: chk('quoteIcon'), starRating: chk('starRating'),
+            starCount: num('starCount'),
+            roleSource: val('roleSource')
+          };
+        }
+
+        /* --------------------------- preview render ------------------------- */
+        const host = document.getElementById('previewFrame');
+
+        function render() {
+          const cfg = readConfig();
+          const isMobile = host.classList.contains('mobile');
+          const layout = cfg.layout;
+          let spv = Math.max(1, isMobile ? cfg.spvSm : cfg.spvLg);
+          if (layout === 'spotlight' || layout === 'magazine') spv = 1;
+          let gap = cfg.spaceBetween;
+          if (layout === 'tilted') { spv = isMobile ? 2 : 4; gap = -15; }
+
+          const cardStyle = buildCardStyle(cfg);
+
+          const slidesHTML = SAMPLE_TESTIMONIALS.map((t, i) => {
+            const initials = getInitials(t.name);
+            const color = AVATAR_COLORS[i % AVATAR_COLORS.length];
+            const avatar = `<div class="pv-avatar" style="background:${color}">${initials}</div>`;
+            const authorInfo = `<div class="pv-author-info"><div class="pv-name">${t.name}</div><div class="pv-role">${t.role}</div></div>`;
+            const header = `<div class="pv-card-header">${avatar}${authorInfo}</div>`;
+
+            let decoration = '';
+            if (layout === 'review') {
+              const stars = Array.from({ length: cfg.starCount || 5 }, () => '<span class="pv-star">&#9733;</span>').join('');
+              decoration = `<div class="pv-stars">${stars}</div>`;
+            } else if (cfg.quoteIcon) {
+              decoration = `<div class="pv-quote-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M11.3 5.2C7.4 7.5 5 11.1 5 15.2c0 2.6 1.7 4.3 3.7 4.3 1.9 0 3.3-1.4 3.3-3.3 0-1.8-1.2-3.1-2.8-3.3.3-2.5 2.3-5 4.8-6.3L11.3 5.2zm9 0C16.4 7.5 14 11.1 14 15.2c0 2.6 1.7 4.3 3.7 4.3 1.9 0 3.3-1.4 3.3-3.3 0-1.8-1.2-3.1-2.8-3.3.3-2.5 2.3-5 4.8-6.3L20.3 5.2z"/></svg></div>`;
+            } else if (cfg.starRating) {
+              const stars = Array.from({ length: cfg.starCount }, () => '<span class="pv-star">&#9733;</span>').join('');
+              decoration = `<div class="pv-stars">${stars}</div>`;
+            }
+
+            const quote = `<div class="pv-quote">${layout === 'colorful' ? '&ldquo;' + t.quote + '&rdquo;' : t.quote}</div>`;
+
+            let extraStyle = cardStyle;
+            let extraContent = '';
+            if (layout === 'colorful') {
+              const bgc = COLORFUL_PALETTE[i % COLORFUL_PALETTE.length];
+              extraStyle += `; background: ${bgc} !important; border: none !important`;
+            } else if (layout === 'review') {
+              extraStyle += `; background: #1a3a2a !important; color: #f5f0e8 !important; border: none !important`;
+            } else if (layout === 'tilted') {
+              const tBg = TILT_PALETTE[i % TILT_PALETTE.length];
+              const angle = (i % 2 === 0 ? -3 : 3);
+              extraStyle += `; background: ${tBg} !important; transform: rotate(${angle}deg); border: none !important`;
+              extraContent = `<div class="pv-tilted-divider"></div>`;
+            }
+
+            const slideW = layout === 'tilted'
+              ? `width:calc((100% - ${Math.max(0,(spv-1)*Math.abs(gap))}px) / ${spv})`
+              : `width:calc((100% - ${(spv-1)*Math.max(0,gap)}px) / ${spv})`;
+
+            return `<div class="swiper-slide" style="${slideW}">
+              <div class="pv-card" style="${extraStyle}">${decoration}${quote}${extraContent}${header}</div>
+            </div>`;
+          }).join('');
+
+          // Build navigation elements grouped by position
+          const navElements = buildNavElements(cfg);
+
+          host.innerHTML = `<div id="previewHost" class="layout-${layout}">
+            <div class="swiper"><div class="swiper-wrapper" style="gap:${Math.max(0,gap)}px">${slidesHTML}</div></div>
+            ${navElements}
+          </div>`;
+
+          wirePreviewControls();
+        }
+
+        function buildCardStyle(cfg) {
+          const parts = [];
+          if (cfg.cardBorder) {
+            parts.push(`border: ${cfg.borderWidth}px solid ${cfg.borderColor}`);
+          } else {
+            parts.push('border: none');
+          }
+          parts.push(`border-radius: ${cfg.borderRadius}px`);
+          if (cfg.cardBgTransparent) {
+            parts.push('background: transparent');
+          } else {
+            parts.push(`background: ${cfg.cardBg}`);
+          }
+          parts.push(`padding: ${cfg.cardPadding}px`);
+          return parts.join('; ');
+        }
+
+        function buildNavElements(cfg) {
+          // Group elements by position
+          const positions = {};
+          const addToPos = (pos, html) => {
+            if (!positions[pos]) positions[pos] = [];
+            positions[pos].push(html);
+          };
+
+          if (cfg.arrows) {
+            let arrowHTML;
+            if (cfg.arrowStyle === 'text') {
+              arrowHTML = `<button class="pv-arrow-text pv-prev">${cfg.prevText}</button><button class="pv-arrow-text pv-next">${cfg.nextText}</button>`;
+            } else {
+              arrowHTML = `<button class="pv-arrow-btn pv-prev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+              <button class="pv-arrow-btn pv-next"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></button>`;
+            }
+            addToPos(cfg.arrowsPosition, arrowHTML);
+          }
+
+          if (cfg.dots) {
+            const dotsHTML = `<div class="pv-dots">${SAMPLE_TESTIMONIALS.map((_, i) => `<button class="pv-dot${i === 0 ? ' active' : ''}" data-i="${i}"></button>`).join('')}</div>`;
+            addToPos(cfg.dotsPosition, dotsHTML);
+          }
+
+          if (cfg.counter) {
+            addToPos(cfg.counterPosition, `<div class="pv-counter">1 / ${SAMPLE_TESTIMONIALS.length}</div>`);
+          }
+
+          return Object.entries(positions).map(([pos, items]) =>
+            `<div class="pv-nav-wrapper pos-${pos}">${items.join('')}</div>`
+          ).join('');
+        }
+
+        function wirePreviewControls() {
+          const root = document.getElementById('previewHost');
+          if (!root) return;
+          const wrapper = root.querySelector('.swiper-wrapper');
+          if (!wrapper) return;
+          const slides = [...root.querySelectorAll('.swiper-slide')];
+          const gap = num('spaceBetween');
+          const step = () => (slides[0] ? slides[0].getBoundingClientRect().width + gap : 300);
+
+          root.querySelectorAll('.pv-prev').forEach(btn => {
+            btn.onclick = () => wrapper.scrollBy({ left: -step() });
+          });
+          root.querySelectorAll('.pv-next').forEach(btn => {
+            btn.onclick = () => {
+              if (wrapper.scrollLeft + wrapper.clientWidth >= wrapper.scrollWidth - 4) wrapper.scrollTo({ left: 0 });
+              else wrapper.scrollBy({ left: step() });
+            };
+          });
+
+          // Dots click
+          root.querySelectorAll('.pv-dot').forEach(dot => {
+            dot.onclick = () => wrapper.scrollTo({ left: step() * parseInt(dot.dataset.i) });
+          });
+
+          // Update dots & counter on scroll
+          wrapper.onscroll = () => {
+            const idx = Math.round(wrapper.scrollLeft / step());
+            root.querySelectorAll('.pv-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+            root.querySelectorAll('.pv-counter').forEach(c => { c.textContent = `${idx + 1} / ${SAMPLE_TESTIMONIALS.length}`; });
+          };
+        }
+
+        /* ----------------------------- conditional rows & conflicts ---------- */
+        function syncRows() {
+          const arrowsOn = chk('arrows');
+          const dotsOn = chk('dots');
+          const counterOn = chk('counter');
+          const arrowStyleText = val('arrowStyle') === 'text';
+          const borderOn = chk('cardBorder');
+
+          // Arrow sub-options
+          document.getElementById('arrowStyleRow').style.display = arrowsOn ? 'block' : 'none';
+          document.getElementById('prevTextRow').style.display = (arrowsOn && arrowStyleText) ? 'block' : 'none';
+          document.getElementById('nextTextRow').style.display = (arrowsOn && arrowStyleText) ? 'block' : 'none';
+          document.getElementById('arrowsPosRow').style.display = arrowsOn ? 'block' : 'none';
+
+          // Dots position
+          document.getElementById('dotsPosRow').style.display = dotsOn ? 'block' : 'none';
+
+          // Counter position
+          document.getElementById('counterPosRow').style.display = counterOn ? 'block' : 'none';
+
+          // Autoplay delay + pause on hover
+          const autoplayOn = chk('autoplay');
+          document.getElementById('autoplayDelayRow').style.display = autoplayOn ? 'block' : 'none';
+          document.getElementById('pauseOnHoverRow').style.display = autoplayOn ? 'flex' : 'none';
+
+          // Card border sub-options
+          document.getElementById('borderWidthRow').style.display = borderOn ? 'block' : 'none';
+          document.getElementById('borderColorRow').style.display = borderOn ? 'flex' : 'none';
+
+          // Star count
+          document.getElementById('starCountRow').style.display = chk('starRating') ? 'block' : 'none';
+
+          // Mutual exclusion: quoteIcon vs starRating
+          // Handled in event listeners below
+
+          // Position conflict logic
+          updatePositionDropdowns();
+
+          // Show conflict helper if dots or counter are visible
+          document.getElementById('posConflictHelper').style.display = (dotsOn || counterOn) ? 'block' : 'none';
+        }
+
+        function updatePositionDropdowns() {
+          const arrowPos = val('arrowsPosition');
+          const dotsPos = val('dotsPosition');
+          const arrowsOn = chk('arrows');
+          const dotsOn = chk('dots');
+
+          // Disable arrow position in dots dropdown
+          const dotsSelect = document.getElementById('dotsPosition');
+          Array.from(dotsSelect.options).forEach(opt => {
+            opt.disabled = arrowsOn && opt.value === arrowPos;
+          });
+
+          // Disable arrow+dots positions in counter dropdown
+          const counterSelect = document.getElementById('counterPosition');
+          Array.from(counterSelect.options).forEach(opt => {
+            opt.disabled = (arrowsOn && opt.value === arrowPos) || (dotsOn && opt.value === dotsPos);
+          });
+
+          // If current selection is disabled, move to first available
+          if (dotsSelect.selectedOptions[0] && dotsSelect.selectedOptions[0].disabled) {
+            const first = Array.from(dotsSelect.options).find(o => !o.disabled);
+            if (first) dotsSelect.value = first.value;
+          }
+          if (counterSelect.selectedOptions[0] && counterSelect.selectedOptions[0].disabled) {
+            const first = Array.from(counterSelect.options).find(o => !o.disabled);
+            if (first) counterSelect.value = first.value;
+          }
+        }
+
+        /* ----------------------------- mutual exclusion -------------------- */
+        document.getElementById('quoteIcon').addEventListener('change', function() {
+          if (this.checked) document.getElementById('starRating').checked = false;
+          updateAll();
+        });
+        document.getElementById('starRating').addEventListener('change', function() {
+          if (this.checked) document.getElementById('quoteIcon').checked = false;
+          updateAll();
+        });
+
+        /* ---------------------------- code generation ----------------------- */
+        let rawCode = '';
+
+        function generateCode() {
+          const c = readConfig();
+          const props = [];
+
+          const addProp = (cond, key, value) => { if (cond) props.push({ key, value }); };
+
+          addProp(c.layout !== DEFAULTS.layout, 'layout', `'${c.layout}'`);
+          addProp(c.spvSm !== DEFAULTS.spvSm, 'slidesPerViewMobile', c.spvSm);
+          addProp(c.spvMd !== DEFAULTS.spvMd, 'slidesPerViewTablet', c.spvMd);
+          addProp(c.spvLg !== DEFAULTS.spvLg, 'slidesPerView', c.spvLg);
+          addProp(c.spaceBetween !== DEFAULTS.spaceBetween, 'spaceBetween', c.spaceBetween);
+          addProp(c.speed !== DEFAULTS.speed, 'speed', c.speed);
+          addProp(c.loop !== DEFAULTS.loop, 'loop', c.loop);
+          addProp(c.overflowVisible !== DEFAULTS.overflowVisible, 'overflowVisible', c.overflowVisible);
+          addProp(c.autoplay !== DEFAULTS.autoplay, 'autoplay', c.autoplay);
+          addProp(c.autoplay && c.autoplayDelay !== DEFAULTS.autoplayDelay, 'autoplayDelay', c.autoplayDelay);
+          addProp(c.autoplay && c.pauseOnHover !== DEFAULTS.pauseOnHover, 'pauseOnHover', c.pauseOnHover);
+          addProp(c.arrows !== DEFAULTS.arrows, 'arrows', c.arrows);
+          addProp(c.arrows && c.arrowStyle !== DEFAULTS.arrowStyle, 'arrowStyle', `'${c.arrowStyle}'`);
+          addProp(c.arrows && c.arrowStyle === 'text' && c.prevText !== DEFAULTS.prevText, 'prevText', `'${c.prevText}'`);
+          addProp(c.arrows && c.arrowStyle === 'text' && c.nextText !== DEFAULTS.nextText, 'nextText', `'${c.nextText}'`);
+          addProp(c.arrows && c.arrowsPosition !== DEFAULTS.arrowsPosition, 'arrowsPosition', `'${c.arrowsPosition}'`);
+          addProp(c.dots !== DEFAULTS.dots, 'dots', c.dots);
+          addProp(c.dots && c.dotsPosition !== DEFAULTS.dotsPosition, 'dotsPosition', `'${c.dotsPosition}'`);
+          addProp(c.counter !== DEFAULTS.counter, 'counter', c.counter);
+          addProp(c.counter && c.counterPosition !== DEFAULTS.counterPosition, 'counterPosition', `'${c.counterPosition}'`);
+          addProp(c.cardBorder !== DEFAULTS.cardBorder, 'cardBorder', c.cardBorder);
+          addProp(c.cardBorder && c.borderWidth !== DEFAULTS.borderWidth, 'borderWidth', c.borderWidth);
+          addProp(c.cardBorder && c.borderColor !== DEFAULTS.borderColor, 'borderColor', `'${c.borderColor}'`);
+          addProp(c.borderRadius !== DEFAULTS.borderRadius, 'borderRadius', c.borderRadius);
+          addProp(c.cardBgTransparent, 'cardBackground', `'transparent'`);
+          addProp(!c.cardBgTransparent && c.cardBg !== DEFAULTS.cardBg, 'cardBackground', `'${c.cardBg}'`);
+          addProp(c.cardPadding !== DEFAULTS.cardPadding, 'cardPadding', c.cardPadding);
+          addProp(c.quoteIcon !== DEFAULTS.quoteIcon, 'quoteIcon', c.quoteIcon);
+          addProp(c.starRating !== DEFAULTS.starRating, 'starRating', c.starRating);
+          addProp(c.starRating && c.starCount !== DEFAULTS.starCount, 'starCount', c.starCount);
+          addProp(c.roleSource !== DEFAULTS.roleSource, 'roleSource', `'${c.roleSource}'`);
+
+          let configBlock = '';
+          if (props.length > 0) {
+            const propsStr = props.map(p => `    ${p.key}: ${p.value},`).join('\n');
+            configBlock = `\n<script>\nwindow.SDLTestimonialSliderConfig = {\n  defaults: {\n${propsStr}\n  }\n};\n<\/script>`;
+          }
+
+          const code =
+`<!-- 1. Add once in Settings → Advanced → Code Injection → Header -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/square-design-lab/Testimonial-Slider@latest/testimonialSlider.css">
+
+<!-- 2. Add once in Settings → Advanced → Code Injection → Footer -->${configBlock}
+<script src="https://cdn.jsdelivr.net/gh/square-design-lab/Testimonial-Slider@latest/testimonialSlider.js"><\/script>
+
+<!-- 3. Set the Section ID to: testimonial-slider -->`;
+
+          rawCode = code;
+          document.getElementById('codeOutput').innerHTML = highlight(code);
+        }
+
+        function highlight(text) {
+          const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+          return esc(text).split('\n').map(line => {
+            let h = line;
+            const isHTML = h.indexOf('&lt;') !== -1;
+            if (isHTML) {
+              // HTML attributes + string values (one pass, before tag coloring)
+              h = h.replace(/ ([\w-]+)="([^"]*)"/g, ' <span class="hl-attr">$1</span>=<span class="hl-str">"$2"</span>');
+              // HTML tags
+              h = h.replace(/(&lt;\/?[\w!-]+)/g, '<span class="hl-tag">$1</span>');
+            } else {
+              // JS property keys
+              h = h.replace(/^(\s+)([\w]+)(:)/g, '$1<span class="hl-key">$2</span>$3');
+              // Single-quoted string values
+              h = h.replace(/'([^']*)'/g, '<span class="hl-str">\'$1\'</span>');
+              // Boolean values
+              h = h.replace(/\b(true|false)\b/g, '<span class="hl-bool">$1</span>');
+              // Number values after colon
+              h = h.replace(/(:\s*)(\d+)(,?\s*$)/g, (m, pre, n, post) => pre + '<span class="hl-num">' + n + '</span>' + post);
+            }
+            return h;
+          }).join('\n');
+        }
+
+        /* ------------------------------- update ----------------------------- */
+        function updateAll() {
+          syncRows();
+          render();
+          generateCode();
+        }
+
+        document.querySelectorAll('input, select').forEach(el => {
+          el.addEventListener('input', updateAll);
+          el.addEventListener('change', updateAll);
+        });
+
+        window.setTab = function(t) {
+          document.body.className = 'tab-' + t;
+          document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('onclick') === "setTab('" + t + "')");
+          });
+          if (t === 'preview') render();
+        };
+        window.setDev = function(d) {
+          document.getElementById('previewFrame').className = d === 'mobile' ? 'mobile' : '';
+          document.querySelectorAll('.device-toggle button').forEach(b => b.classList.remove('active'));
+          document.getElementById(d + 'Toggle').classList.add('active');
+          render();
+        };
+        window.togGroup = function(h) { h.parentNode.classList.toggle('open'); };
+        window.copyCode = function() {
+          navigator.clipboard.writeText(rawCode);
+          const copied = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied!';
+          ['copyBtn','mobileCopyBtn'].forEach(id => {
+            const btn = document.getElementById(id); if (!btn) return;
+            const orig = btn.innerHTML; btn.innerHTML = copied; btn.classList.add('copied');
+            setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
+          });
+        };
+
+        updateAll();
+      } catch (err) {
+        document.body.innerHTML = '<div style="padding:40px;font-family:monospace"><h1>Config error</h1><pre>' + err.message + '\n' + err.stack + '</pre></div>';
+      }
+    </script>
+</body>
+</html>
