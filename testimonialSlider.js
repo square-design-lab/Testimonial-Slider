@@ -7729,6 +7729,7 @@
     autoplay: false,
     autoplayDelay: 5000,
     autoplayMode: 'default',   // 'default' | 'continuous'
+    continuousSpeed: 50,       // pixels per second for continuous mode
     slidesPerGroup: 1,
     pauseOnHover: true,
     loop: true,
@@ -8200,8 +8201,12 @@
     '.' + CSS_PREFIX + 'wrapper.sdl-ts-overflow .swiper {' +
     '  overflow: visible;' +
     '}' +
+    '.' + CSS_PREFIX + 'wrapper.sdl-ts-continuous .swiper {' +
+    '  overflow: hidden;' +
+    '}' +
     '.' + CSS_PREFIX + 'wrapper.sdl-ts-continuous .swiper-wrapper {' +
-    '  transition-timing-function: linear !important;' +
+    '  display: flex !important;' +
+    '  width: max-content !important;' +
     '}' +
     '.' + CSS_PREFIX + 'wrapper .swiper:focus {' +
     '  outline: 2px solid currentColor;' +
@@ -8705,6 +8710,71 @@
   }
 
   /* ──────────────────────────────────────────────────────────────────
+   *  CONTINUOUS SCROLL (CSS @keyframes marquee)
+   * ────────────────────────────────────────────────────────────── */
+  function initContinuousScroll(built, settings) {
+    var wrapper = built.swiperEl.querySelector('.swiper-wrapper');
+    if (!wrapper) return;
+
+    // Remove Swiper's transform control
+    wrapper.style.transform = 'none';
+    wrapper.style.transitionDuration = '0ms';
+
+    var checkWidth = function () {
+      var slides = Array.from(wrapper.children);
+      if (!slides.length) return;
+
+      var totalWidth = 0;
+      slides.forEach(function (s) { totalWidth += s.offsetWidth; });
+      if (totalWidth === 0) { requestAnimationFrame(checkWidth); return; }
+
+      var gap = settings.spaceBetween || 0;
+      totalWidth += gap * slides.length;
+
+      // Clone slides enough to fill 3x viewport
+      var viewWidth = built.swiperEl.offsetWidth;
+      var clonesNeeded = Math.max(2, Math.ceil((viewWidth * 3) / totalWidth));
+      for (var c = 0; c < clonesNeeded; c++) {
+        slides.forEach(function (s) {
+          var clone = s.cloneNode(true);
+          clone.classList.add(CSS_PREFIX + 'clone');
+          wrapper.appendChild(clone);
+        });
+      }
+
+      // Calculate animation
+      var speed = settings.continuousSpeed || 50;
+      var duration = totalWidth / speed;
+
+      // Inject keyframes
+      var animName = 'sdlTsMarquee' + Date.now();
+      var keyframeCSS = '@keyframes ' + animName + ' { from { transform: translateX(0); } to { transform: translateX(-' + totalWidth + 'px); } }';
+      var styleEl = document.createElement('style');
+      styleEl.textContent = keyframeCSS;
+      document.head.appendChild(styleEl);
+
+      wrapper.style.display = 'flex';
+      wrapper.style.width = 'max-content';
+      wrapper.style.animation = animName + ' ' + duration + 's linear infinite';
+
+      // Pause on hover
+      if (settings.pauseOnHover) {
+        built.swiperEl.addEventListener('mouseenter', function () {
+          wrapper.style.animationPlayState = 'paused';
+        });
+        built.swiperEl.addEventListener('mouseleave', function () {
+          wrapper.style.animationPlayState = 'running';
+        });
+      }
+
+      // Store for cleanup
+      built.wrapper._sdlTsContinuous = { styleEl: styleEl };
+    };
+
+    requestAnimationFrame(checkWidth);
+  }
+
+  /* ──────────────────────────────────────────────────────────────────
    *  INIT SWIPER
    * ────────────────────────────────────────────────────────────── */
   function initSwiper(built, settings, totalSlides) {
@@ -8775,24 +8845,18 @@
       };
     }
 
-    // Autoplay
-    if (settings.autoplay) {
-      if (settings.autoplayMode === 'continuous') {
-        config.autoplay = {
-          delay: 0,
-          disableOnInteraction: false,
-          pauseOnMouseEnter: !!settings.pauseOnHover,
-        };
-        config.speed = settings.speed || 3000;
-        config.loop = true;
-        config.allowTouchMove = true;
-      } else {
-        config.autoplay = {
-          delay: settings.autoplayDelay,
-          disableOnInteraction: false,
-          pauseOnMouseEnter: !!settings.pauseOnHover,
-        };
-      }
+    // Overflow — add extra loop slides so partial next slide is always visible
+    if (settings.overflow && config.loop) {
+      config.loopAdditionalSlides = settings.slidesPerView;
+    }
+
+    // Autoplay (non-continuous)
+    if (settings.autoplay && settings.autoplayMode !== 'continuous') {
+      config.autoplay = {
+        delay: settings.autoplayDelay,
+        disableOnInteraction: false,
+        pauseOnMouseEnter: !!settings.pauseOnHover,
+      };
     }
 
     // Navigation — arrows
@@ -8812,6 +8876,13 @@
       };
     }
 
+    // Continuous mode uses CSS animation instead of Swiper autoplay
+    if (settings.autoplay && settings.autoplayMode === 'continuous') {
+      config.loop = false;
+      config.autoplay = false;
+      config.allowTouchMove = false;
+    }
+
     var swiper = new Swiper(built.swiperEl, config);
 
     // Counter update
@@ -8822,6 +8893,11 @@
           currentEl.textContent = pad(swiper.realIndex + 1);
         }
       });
+    }
+
+    // Continuous marquee via CSS animation
+    if (settings.autoplay && settings.autoplayMode === 'continuous') {
+      initContinuousScroll(built, settings);
     }
 
     return swiper;

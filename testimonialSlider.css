@@ -60,8 +60,13 @@ section[id^="testimonial-slider"][data-sdl-ts-state="ready"] .summary-block-wrap
   overflow: visible;
 }
 
+.sdl-ts-wrapper.sdl-ts-continuous .swiper {
+  overflow: hidden;
+}
+
 .sdl-ts-wrapper.sdl-ts-continuous .swiper-wrapper {
-  transition-timing-function: linear !important;
+  display: flex !important;
+  width: max-content !important;
 }
 
 .sdl-ts-wrapper .swiper:focus {

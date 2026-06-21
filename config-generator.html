@@ -498,6 +498,11 @@
                         <input type="number" id="slidesPerGroup" value="1" min="1" max="5">
                         <div class="helper-text">Number of slides to advance per autoplay step.</div>
                     </div>
+                    <div class="control-row" id="continuousSpeedRow" style="display:none;">
+                        <label>Scroll Speed (px/s)</label>
+                        <input type="number" id="continuousSpeed" value="50" min="10" max="300" step="10">
+                        <div class="helper-text">Pixels per second. Lower = slower, higher = faster.</div>
+                    </div>
                     <div class="toggle-row" id="pauseOnHoverRow" style="display:none;"><label>Pause on Hover</label><input type="checkbox" id="pauseOnHover" checked></div>
                 </div>
             </div>
@@ -663,7 +668,7 @@
           spvSm: 1, spvMd: 2, spvLg: 3,
           spaceBetween: 24, speed: 500,
           loop: true, overflowVisible: false,
-          autoplay: false, autoplayDelay: 5000, autoplayMode: 'default', slidesPerGroup: 1, pauseOnHover: true,
+          autoplay: false, autoplayDelay: 5000, autoplayMode: 'default', continuousSpeed: 50, slidesPerGroup: 1, pauseOnHover: true,
           arrows: true, arrowStyle: 'icon', prevText: 'Prev', nextText: 'Next',
           arrowsPosition: 'bottom-center',
           dots: false, dotsPosition: 'bottom-center',
@@ -704,7 +709,7 @@
             spvSm: num('spvSm'), spvMd: num('spvMd'), spvLg: num('spvLg'),
             spaceBetween: num('spaceBetween'), speed: num('speed'),
             loop: chk('loop'), overflowVisible: chk('overflowVisible'),
-            autoplay: chk('autoplay'), autoplayDelay: num('autoplayDelay'), autoplayMode: val('autoplayMode'), slidesPerGroup: num('slidesPerGroup'), pauseOnHover: chk('pauseOnHover'),
+            autoplay: chk('autoplay'), autoplayDelay: num('autoplayDelay'), autoplayMode: val('autoplayMode'), continuousSpeed: num('continuousSpeed'), slidesPerGroup: num('slidesPerGroup'), pauseOnHover: chk('pauseOnHover'),
             arrows: chk('arrows'), arrowStyle: val('arrowStyle'),
             prevText: val('prevText'), nextText: val('nextText'),
             arrowsPosition: val('arrowsPosition'),
@@ -898,6 +903,7 @@
           document.getElementById('autoplayModeRow').style.display = autoplayOn ? 'block' : 'none';
           document.getElementById('autoplayDelayRow').style.display = (autoplayOn && !isContinuous) ? 'block' : 'none';
           document.getElementById('slidesPerGroupRow').style.display = (autoplayOn && !isContinuous) ? 'block' : 'none';
+          document.getElementById('continuousSpeedRow').style.display = (autoplayOn && isContinuous) ? 'block' : 'none';
           document.getElementById('pauseOnHoverRow').style.display = autoplayOn ? 'flex' : 'none';
 
           // Card border sub-options
@@ -1005,6 +1011,7 @@
           addProp(c.overflowVisible !== DEFAULTS.overflowVisible, 'overflow', c.overflowVisible);
           addProp(c.autoplay !== DEFAULTS.autoplay, 'autoplay', c.autoplay);
           addProp(c.autoplay && c.autoplayMode !== DEFAULTS.autoplayMode, 'autoplayMode', `'${c.autoplayMode}'`);
+          addProp(c.autoplay && c.autoplayMode === 'continuous' && c.continuousSpeed !== DEFAULTS.continuousSpeed, 'continuousSpeed', c.continuousSpeed);
           addProp(c.autoplay && c.autoplayMode !== 'continuous' && c.autoplayDelay !== DEFAULTS.autoplayDelay, 'autoplayDelay', c.autoplayDelay);
           addProp(c.autoplay && c.autoplayMode !== 'continuous' && c.slidesPerGroup !== DEFAULTS.slidesPerGroup, 'slidesPerGroup', c.slidesPerGroup);
           addProp(c.autoplay && c.pauseOnHover !== DEFAULTS.pauseOnHover, 'pauseOnHover', c.pauseOnHover);
