@@ -9115,15 +9115,15 @@
           var inner = slide.querySelector('.swiper-slide-transform') || slide;
           var tf = inner.style.transform;
           if (!tf) continue;
-          var yOffset = Math.max(0, progress) * 12;
+          var absP = Math.abs(progress);
+          var yOffset = progress < -0.01 ? absP * 12 : 0;
           tf = tf.replace(/translate3d\(([^,]+),\s*([^,]+),/, function (match, x) {
             return 'translate3d(' + x + ', ' + yOffset + 'px,';
           });
           inner.style.transform = tf;
-          if (progress > 0.01) {
-            var absP = Math.min(progress, 5);
+          if (progress < -0.01) {
             inner.style.opacity = Math.max(1 - absP * 0.1, 0.5);
-          } else if (progress < -0.5) {
+          } else if (progress > 0.5) {
             inner.style.opacity = 0;
           } else {
             inner.style.opacity = 1;
