@@ -496,7 +496,7 @@
                         <input type="number" id="speed" value="500" min="0">
                     </div>
                     <div class="toggle-row"><label>Loop (Infinite)</label><input type="checkbox" id="loop" checked></div>
-                    <div class="toggle-row"><label>Overflow Visible</label><input type="checkbox" id="overflowVisible"></div>
+                    <div class="toggle-row" id="overflowRow"><label>Overflow Visible</label><input type="checkbox" id="overflowVisible"></div>
                     <div id="overflowPeekGroup" style="display:none;">
                         <label>Peek Amount (px)</label>
                         <div class="control-row grid3">
@@ -965,8 +965,13 @@
           // Mutual exclusion: quoteIcon vs starRating
           // Handled in event listeners below
 
+          // Hide overflow for stacked layouts
+          const isStacked = val('layout') === 'stacked' || val('layout') === 'stacked-split';
+          document.getElementById('overflowRow').style.display = isStacked ? 'none' : 'flex';
+          if (isStacked) document.getElementById('overflowVisible').checked = false;
+
           // Overflow peek sub-options
-          document.getElementById('overflowPeekGroup').style.display = chk('overflowVisible') ? 'block' : 'none';
+          document.getElementById('overflowPeekGroup').style.display = (!isStacked && chk('overflowVisible')) ? 'block' : 'none';
 
           // Colorful palette group
           const isColorful = val('layout') === 'colorful';
