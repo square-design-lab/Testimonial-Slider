@@ -8580,7 +8580,7 @@
     '.' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked,' +
     '.' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked-split {' +
     '  overflow: hidden;' +
-    '  padding: 20px 40px;' +
+    '  padding: 20px 60px 80px 40px;' +
     '}' +
     '@media (max-width: 767px) {' +
     '  .' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked .swiper,' +
@@ -8589,7 +8589,7 @@
     '  }' +
     '  .' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked,' +
     '  .' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked-split {' +
-    '    padding: 20px 20px;' +
+    '    padding: 20px 40px 60px 20px;' +
     '  }' +
     '}' +
 
@@ -9051,10 +9051,10 @@
     if (settings.layout === 'stacked' || settings.layout === 'stacked-split') {
       config.effect = 'cards';
       config.cardsEffect = {
-        slideShadows: true,
+        slideShadows: false,
         perSlideOffset: 8,
-        perSlideRotate: 2,
-        rotate: true,
+        perSlideRotate: 0,
+        rotate: false,
       };
       config.slidesPerView = 1;
       config.spaceBetween = 0;
@@ -9102,6 +9102,32 @@
     }
 
     var swiper = new Swiper(built.swiperEl, config);
+
+    // Diagonal fan-out for stacked layouts (CodePen-style: translate down-right, no rotation)
+    if (settings.layout === 'stacked' || settings.layout === 'stacked-split') {
+      swiper.on('setTranslate', function () {
+        var slides = swiper.slides;
+        if (!slides || !slides.length) return;
+        for (var si = 0; si < slides.length; si++) {
+          var slide = slides[si];
+          var progress = slide.progress;
+          var inner = slide.querySelector('.swiper-slide-transform') || slide;
+          var tf = inner.style.transform;
+          if (!tf) continue;
+          var yOffset = Math.max(0, progress) * 10;
+          tf = tf.replace(/translate3d\(([^,]+),\s*([^,]+),/, function (match, x) {
+            return 'translate3d(' + x + ', ' + yOffset + 'px,';
+          });
+          inner.style.transform = tf;
+          if (progress > 0.01) {
+            var absP = Math.min(progress, 5);
+            inner.style.opacity = Math.max(1 - absP * 0.12, 0.4);
+          } else {
+            inner.style.opacity = 1;
+          }
+        }
+      });
+    }
 
     // Counter update
     if (built.counterEl) {
