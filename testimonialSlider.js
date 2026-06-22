@@ -9122,6 +9122,8 @@
           if (progress > 0.01) {
             var absP = Math.min(progress, 5);
             inner.style.opacity = Math.max(1 - absP * 0.12, 0.4);
+          } else if (progress < -1) {
+            inner.style.opacity = 0;
           } else {
             inner.style.opacity = 1;
           }
