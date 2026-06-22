@@ -9106,7 +9106,7 @@
 
     // Diagonal fan-out for stacked layouts (CodePen-style: translate down-right, no rotation)
     if (settings.layout === 'stacked' || settings.layout === 'stacked-split') {
-      swiper.on('setTranslate', function () {
+      var applyStackedFanOut = function () {
         var slides = swiper.slides;
         if (!slides || !slides.length) return;
         for (var si = 0; si < slides.length; si++) {
@@ -9129,7 +9129,9 @@
             inner.style.opacity = 1;
           }
         }
-      });
+      };
+      swiper.on('setTranslate', applyStackedFanOut);
+      applyStackedFanOut();
     }
 
     // Counter update
