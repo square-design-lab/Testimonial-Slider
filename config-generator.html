@@ -472,8 +472,16 @@
                         <label>Transition Speed (ms)</label>
                         <input type="number" id="speed" value="500" min="0">
                     </div>
-                    <div class="toggle-row"><label>Loop</label><input type="checkbox" id="loop" checked></div>
+                    <div class="toggle-row"><label>Loop (Infinite)</label><input type="checkbox" id="loop" checked></div>
                     <div class="toggle-row"><label>Overflow Visible</label><input type="checkbox" id="overflowVisible"></div>
+                    <div id="overflowPeekGroup" style="display:none;">
+                        <label>Peek Amount (px)</label>
+                        <div class="control-row grid3">
+                            <div><label>Mobile</label><input type="number" id="peekMobile" value="20" min="0" max="200"></div>
+                            <div><label>Tablet</label><input type="number" id="peekTablet" value="30" min="0" max="200"></div>
+                            <div><label>Desktop</label><input type="number" id="peekDesktop" value="40" min="0" max="200"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -590,6 +598,11 @@
                         <label>Card Padding (px)</label>
                         <input type="number" id="cardPadding" value="32" min="0">
                     </div>
+                    <label style="margin-top:12px;">Image Size (px) — 0 = default</label>
+                    <div class="control-row grid3" style="grid-template-columns:1fr 1fr;">
+                        <div><label>Width</label><input type="number" id="imageWidth" value="0" min="0" max="500"></div>
+                        <div><label>Height</label><input type="number" id="imageHeight" value="0" min="0" max="500"></div>
+                    </div>
                 </div>
             </div>
 
@@ -667,7 +680,8 @@
           layout: 'cards',
           spvSm: 1, spvMd: 2, spvLg: 3,
           spaceBetween: 24, speed: 500,
-          loop: true, overflowVisible: false,
+          loop: true, overflowVisible: false, peekDesktop: 40, peekTablet: 30, peekMobile: 20,
+          imageWidth: 0, imageHeight: 0,
           autoplay: false, autoplayDelay: 5000, autoplayMode: 'default', continuousSpeed: 50, slidesPerGroup: 1, pauseOnHover: true,
           arrows: true, arrowStyle: 'icon', prevText: 'Prev', nextText: 'Next',
           arrowsPosition: 'bottom-center',
@@ -709,6 +723,8 @@
             spvSm: num('spvSm'), spvMd: num('spvMd'), spvLg: num('spvLg'),
             spaceBetween: num('spaceBetween'), speed: num('speed'),
             loop: chk('loop'), overflowVisible: chk('overflowVisible'),
+            peekDesktop: num('peekDesktop'), peekTablet: num('peekTablet'), peekMobile: num('peekMobile'),
+            imageWidth: num('imageWidth'), imageHeight: num('imageHeight'),
             autoplay: chk('autoplay'), autoplayDelay: num('autoplayDelay'), autoplayMode: val('autoplayMode'), continuousSpeed: num('continuousSpeed'), slidesPerGroup: num('slidesPerGroup'), pauseOnHover: chk('pauseOnHover'),
             arrows: chk('arrows'), arrowStyle: val('arrowStyle'),
             prevText: val('prevText'), nextText: val('nextText'),
@@ -916,6 +932,9 @@
           // Mutual exclusion: quoteIcon vs starRating
           // Handled in event listeners below
 
+          // Overflow peek sub-options
+          document.getElementById('overflowPeekGroup').style.display = chk('overflowVisible') ? 'block' : 'none';
+
           // Colorful palette group
           const isColorful = val('layout') === 'colorful';
           document.getElementById('colorfulPaletteGroup').style.display = isColorful ? 'block' : 'none';
@@ -1009,6 +1028,11 @@
           addProp(c.speed !== DEFAULTS.speed, 'speed', c.speed);
           addProp(c.loop !== DEFAULTS.loop, 'loop', c.loop);
           addProp(c.overflowVisible !== DEFAULTS.overflowVisible, 'overflow', c.overflowVisible);
+          addProp(c.overflowVisible && c.peekDesktop !== DEFAULTS.peekDesktop, 'overflowPeek', c.peekDesktop);
+          addProp(c.overflowVisible && c.peekTablet !== DEFAULTS.peekTablet, 'overflowPeekTablet', c.peekTablet);
+          addProp(c.overflowVisible && c.peekMobile !== DEFAULTS.peekMobile, 'overflowPeekMobile', c.peekMobile);
+          addProp(c.imageWidth !== DEFAULTS.imageWidth, 'imageWidth', c.imageWidth);
+          addProp(c.imageHeight !== DEFAULTS.imageHeight, 'imageHeight', c.imageHeight);
           addProp(c.autoplay !== DEFAULTS.autoplay, 'autoplay', c.autoplay);
           addProp(c.autoplay && c.autoplayMode !== DEFAULTS.autoplayMode, 'autoplayMode', `'${c.autoplayMode}'`);
           addProp(c.autoplay && c.autoplayMode === 'continuous' && c.continuousSpeed !== DEFAULTS.continuousSpeed, 'continuousSpeed', c.continuousSpeed);

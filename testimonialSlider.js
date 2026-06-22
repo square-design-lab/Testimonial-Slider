@@ -7773,6 +7773,13 @@
 
     // Overflow
     overflow: false,
+    overflowPeek: 40,         // px of next slide visible on desktop
+    overflowPeekTablet: 30,   // px on tablet
+    overflowPeekMobile: 20,   // px on mobile
+
+    // Image sizing (0 = auto/default)
+    imageWidth: 0,
+    imageHeight: 0,
 
     // Colorful layout
     colorPalette: ['#FFF3B0', '#FFB3D9', '#B3FFB3', '#B3D9FF', '#FFD9B3', '#D9B3FF'],
@@ -8209,11 +8216,22 @@
     '  pointer-events: none;' +
     '  z-index: 0;' +
     '  overflow: hidden;' +
-    '  opacity: 0.5;' +
+    '  width: var(--sdl-ts-peek, 40px);' +
+    '  transform: translateX(calc(100% + var(--sdl-ts-gap, 24px)));' +
     '}' +
     '.' + CSS_PREFIX + 'overflow-peek .swiper-slide {' +
-    '  width: 100% !important;' +
+    '  width: var(--sdl-ts-slide-width, 100%) !important;' +
     '  height: 100%;' +
+    '}' +
+    '@media (max-width: 1023px) {' +
+    '  .' + CSS_PREFIX + 'overflow-peek {' +
+    '    width: var(--sdl-ts-peek-tablet, 30px);' +
+    '  }' +
+    '}' +
+    '@media (max-width: 767px) {' +
+    '  .' + CSS_PREFIX + 'overflow-peek {' +
+    '    width: var(--sdl-ts-peek-mobile, 20px);' +
+    '  }' +
     '}' +
     '.' + CSS_PREFIX + 'wrapper.sdl-ts-continuous .swiper {' +
     '  overflow: hidden;' +
@@ -8258,7 +8276,6 @@
     '}' +
     '.' + CSS_PREFIX + 'card .' + CSS_PREFIX + 'quote {' +
     '  flex: 1;' +
-    '  font-size: 1em;' +
     '  line-height: 1.6;' +
     '  margin: 0 0 24px 0 !important;' +
     '}' +
@@ -8269,8 +8286,8 @@
     '  margin-top: auto;' +
     '}' +
     '.' + CSS_PREFIX + 'avatar {' +
-    '  width: 48px !important;' +
-    '  height: 48px !important;' +
+    '  width: var(--sdl-ts-img-w, 48px) !important;' +
+    '  height: var(--sdl-ts-img-h, 48px) !important;' +
     '  border-radius: 50% !important;' +
     '  object-fit: cover !important;' +
     '  flex-shrink: 0;' +
@@ -8281,11 +8298,9 @@
     '}' +
     '.' + CSS_PREFIX + 'name {' +
     '  font-weight: 600;' +
-    '  font-size: 0.95em;' +
     '  line-height: 1.3;' +
     '}' +
     '.' + CSS_PREFIX + 'role {' +
-    '  font-size: 0.85em;' +
     '  opacity: 0.6;' +
     '  line-height: 1.3;' +
     '  margin-top: 2px;' +
@@ -8305,7 +8320,6 @@
     '  margin-bottom: 24px;' +
     '}' +
     '.' + CSS_PREFIX + 'spotlight .' + CSS_PREFIX + 'quote {' +
-    '  font-size: 1.35em;' +
     '  line-height: 1.7;' +
     '  margin: 0 0 32px 0 !important;' +
     '  font-style: italic;' +
@@ -8316,8 +8330,8 @@
     '  gap: 14px;' +
     '}' +
     '.' + CSS_PREFIX + 'spotlight .' + CSS_PREFIX + 'avatar {' +
-    '  width: 56px !important;' +
-    '  height: 56px !important;' +
+    '  width: var(--sdl-ts-img-w, 56px) !important;' +
+    '  height: var(--sdl-ts-img-h, 56px) !important;' +
     '}' +
 
     /* ── Minimal layout ── */
@@ -8331,7 +8345,6 @@
     '  border-radius: var(--sdl-ts-card-radius, 8px);' +
     '}' +
     '.' + CSS_PREFIX + 'minimal-card .' + CSS_PREFIX + 'number {' +
-    '  font-size: 2em;' +
     '  font-weight: 700;' +
     '  opacity: 0.1;' +
     '  line-height: 1;' +
@@ -8339,7 +8352,6 @@
     '}' +
     '.' + CSS_PREFIX + 'minimal-card .' + CSS_PREFIX + 'quote {' +
     '  flex: 1;' +
-    '  font-size: 1em;' +
     '  line-height: 1.6;' +
     '  margin: 0 0 24px 0 !important;' +
     '}' +
@@ -8378,12 +8390,8 @@
     '  padding: 48px 40px;' +
     '}' +
     '.' + CSS_PREFIX + 'magazine-content .' + CSS_PREFIX + 'quote {' +
-    '  font-size: 1.15em;' +
     '  line-height: 1.7;' +
     '  margin: 16px 0 24px 0 !important;' +
-    '}' +
-    '.' + CSS_PREFIX + 'magazine-content .' + CSS_PREFIX + 'name {' +
-    '  font-size: 1.05em;' +
     '}' +
 
     /* ── Colorful layout ── */
@@ -8397,7 +8405,6 @@
     '}' +
     '.' + CSS_PREFIX + 'colorful-card .' + CSS_PREFIX + 'quote {' +
     '  flex: 1;' +
-    '  font-size: 1.05em;' +
     '  line-height: 1.6;' +
     '  margin: 0 0 24px 0 !important;' +
     '  color: #000;' +
@@ -8408,11 +8415,9 @@
     '}' +
     '.' + CSS_PREFIX + 'colorful-card .' + CSS_PREFIX + 'name {' +
     '  font-weight: 700;' +
-    '  font-size: 1.1em;' +
     '  color: #000;' +
     '}' +
     '.' + CSS_PREFIX + 'colorful-card .' + CSS_PREFIX + 'role {' +
-    '  font-size: 0.9em;' +
     '  color: #000;' +
     '  opacity: 0.7;' +
     '}' +
@@ -8431,7 +8436,6 @@
     '}' +
     '.' + CSS_PREFIX + 'review-tag {' +
     '  display: inline-block;' +
-    '  font-size: 0.75em;' +
     '  text-transform: lowercase;' +
     '  letter-spacing: 0.03em;' +
     '  opacity: 0.7;' +
@@ -8439,13 +8443,11 @@
     '}' +
     '.' + CSS_PREFIX + 'review-card .' + CSS_PREFIX + 'quote {' +
     '  flex: 1;' +
-    '  font-size: 0.95em;' +
     '  line-height: 1.6;' +
     '  margin: 0 0 24px 0 !important;' +
     '}' +
     '.' + CSS_PREFIX + 'review-card .' + CSS_PREFIX + 'name {' +
     '  margin-top: auto;' +
-    '  font-size: 0.85em;' +
     '  text-transform: uppercase;' +
     '  letter-spacing: 0.05em;' +
     '  opacity: 0.7;' +
@@ -8469,7 +8471,6 @@
     '}' +
     '.' + CSS_PREFIX + 'tilted-card .' + CSS_PREFIX + 'quote {' +
     '  flex: 1;' +
-    '  font-size: 0.95em;' +
     '  line-height: 1.6;' +
     '  margin: 0 0 20px 0 !important;' +
     '  color: #fff;' +
@@ -8482,11 +8483,9 @@
     '}' +
     '.' + CSS_PREFIX + 'tilted-card .' + CSS_PREFIX + 'name {' +
     '  font-weight: 600;' +
-    '  font-size: 1em;' +
     '  color: #fff;' +
     '}' +
     '.' + CSS_PREFIX + 'tilted-card .' + CSS_PREFIX + 'role {' +
-    '  font-size: 0.85em;' +
     '  color: rgba(255,255,255,0.7);' +
     '  margin-top: 4px;' +
     '}' +
@@ -8585,9 +8584,6 @@
     '  .' + CSS_PREFIX + 'magazine-content {' +
     '    padding: 24px;' +
     '  }' +
-    '  .' + CSS_PREFIX + 'spotlight .' + CSS_PREFIX + 'quote {' +
-    '    font-size: 1.1em;' +
-    '  }' +
     '  .' + CSS_PREFIX + 'tilted-card {' +
     '    padding: 24px 20px;' +
     '  }' +
@@ -8629,6 +8625,12 @@
     wrapper.style.setProperty('--sdl-ts-card-padding', settings.cardPadding + 'px');
     if (settings.cardBackground) {
       wrapper.style.setProperty('--sdl-ts-card-bg', settings.cardBackground);
+    }
+    if (settings.imageWidth) {
+      wrapper.style.setProperty('--sdl-ts-img-w', settings.imageWidth + 'px');
+    }
+    if (settings.imageHeight) {
+      wrapper.style.setProperty('--sdl-ts-img-h', settings.imageHeight + 'px');
     }
 
     // Inherit site font
@@ -8925,25 +8927,26 @@
 
     // Overflow peek: keep a right-side ghost showing the next slide
     if (built.peekRight && settings.overflow) {
+      // Set CSS custom properties for responsive peek widths
+      built.swiperEl.style.setProperty('--sdl-ts-peek', (settings.overflowPeek || 40) + 'px');
+      built.swiperEl.style.setProperty('--sdl-ts-peek-tablet', (settings.overflowPeekTablet || 30) + 'px');
+      built.swiperEl.style.setProperty('--sdl-ts-peek-mobile', (settings.overflowPeekMobile || 20) + 'px');
+      built.swiperEl.style.setProperty('--sdl-ts-gap', (settings.spaceBetween || 0) + 'px');
+
       var updatePeek = function () {
         var spv = Math.floor(swiper.params.slidesPerView);
         var nextIdx = (swiper.realIndex + spv) % totalSlides;
         var t = built.testimonials[nextIdx];
         built.peekRight.innerHTML = '<div class="swiper-slide">' + buildSlideHTML(t, nextIdx, settings) + '</div>';
 
-        // Size the peek container based on actual slide width
         var activeSlide = built.swiperEl.querySelector('.swiper-slide');
         if (activeSlide) {
-          var slideW = activeSlide.offsetWidth;
-          var gap = settings.spaceBetween || 0;
-          built.peekRight.style.width = slideW + 'px';
-          built.peekRight.style.transform = 'translateX(calc(100% + ' + gap + 'px))';
+          built.swiperEl.style.setProperty('--sdl-ts-slide-width', activeSlide.offsetWidth + 'px');
         }
       };
 
       swiper.on('slideChange', updatePeek);
       swiper.on('resize', updatePeek);
-      // Initial update after layout settles
       requestAnimationFrame(function () { updatePeek(); });
     }
 
