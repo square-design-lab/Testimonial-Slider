@@ -8571,6 +8571,11 @@
     '  overflow: visible !important;' +
     '  max-width: 500px;' +
     '  margin: 0 auto;' +
+    '  position: relative;' +
+    '}' +
+    '.' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked .swiper-wrapper,' +
+    '.' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked-split .swiper-wrapper {' +
+    '  position: relative;' +
     '}' +
     '.' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked,' +
     '.' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked-split {' +
@@ -9041,11 +9046,12 @@
         rotate: true,
       };
       config.slidesPerView = 1;
+      config.spaceBetween = 0;
       config.grabCursor = true;
       config.breakpoints = {
-        0: { slidesPerView: 1 },
-        768: { slidesPerView: 1 },
-        1024: { slidesPerView: 1 },
+        0: { slidesPerView: 1, spaceBetween: 0 },
+        768: { slidesPerView: 1, spaceBetween: 0 },
+        1024: { slidesPerView: 1, spaceBetween: 0 },
       };
     }
 

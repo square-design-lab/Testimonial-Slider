@@ -457,6 +457,12 @@ section[id^="testimonial-slider"][data-sdl-ts-state="ready"] .summary-block-wrap
   overflow: visible !important;
   max-width: 500px;
   margin: 0 auto;
+  position: relative;
+}
+
+.sdl-ts-wrapper.sdl-ts-layout-stacked .swiper-wrapper,
+.sdl-ts-wrapper.sdl-ts-layout-stacked-split .swiper-wrapper {
+  position: relative;
 }
 
 .sdl-ts-wrapper.sdl-ts-layout-stacked,
