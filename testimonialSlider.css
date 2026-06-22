@@ -417,6 +417,49 @@ section[id^="testimonial-slider"][data-sdl-ts-state="ready"] .summary-block-wrap
 
 
 /* ──────────────────────────────────────────────────────────────────
+ *  5e. STACKED LAYOUT
+ * ────────────────────────────────────────────────────────────── */
+
+.sdl-ts-stacked-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--sdl-ts-card-padding, 40px);
+  box-sizing: border-box;
+  border-radius: var(--sdl-ts-card-radius, 16px);
+  background: var(--sdl-ts-card-bg, #f5f5f5);
+  border: var(--sdl-ts-card-border, none);
+}
+
+.sdl-ts-stacked-card .sdl-ts-quote-icon {
+  margin-bottom: 20px;
+}
+
+.sdl-ts-stacked-card .sdl-ts-stars {
+  margin-bottom: 16px;
+}
+
+.sdl-ts-stacked-card .sdl-ts-quote {
+  flex: 1;
+  line-height: 1.7;
+  margin: 0 0 28px 0 !important;
+}
+
+.sdl-ts-stacked-card .sdl-ts-author {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: auto;
+}
+
+.sdl-ts-wrapper.sdl-ts-layout-stacked .swiper {
+  overflow: visible;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+
+/* ──────────────────────────────────────────────────────────────────
  *  8. NAVIGATION — ARROWS
  * ────────────────────────────────────────────────────────────── */
 

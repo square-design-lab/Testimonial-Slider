@@ -7722,7 +7722,7 @@
    *  DEFAULT SETTINGS
    * ────────────────────────────────────────────────────────────── */
   var DEFAULTS = {
-    layout: 'cards',          // 'cards' | 'spotlight' | 'minimal' | 'magazine' | 'colorful' | 'review' | 'tilted'
+    layout: 'cards',          // 'cards' | 'spotlight' | 'minimal' | 'magazine' | 'colorful' | 'review' | 'tilted' | 'stacked'
     slidesPerView: 3,
     spaceBetween: 24,
     speed: 500,
@@ -8123,6 +8123,26 @@
       html += '</div>';
     }
 
+    else if (layout === 'stacked') {
+      html += '<div class="' + CSS_PREFIX + 'stacked-card">';
+      if (settings.showStarRating) {
+        html += buildStarRating(settings.starCount);
+      } else if (settings.showQuoteIcon) {
+        html += QUOTE_ICON_SVG;
+      }
+      html += '<p class="' + CSS_PREFIX + 'quote">' + testimonial.quote + '</p>';
+      html += '<div class="' + CSS_PREFIX + 'author">';
+      if (testimonial.image) {
+        html += '<img class="' + CSS_PREFIX + 'avatar" src="' + testimonial.image + '" alt="' + testimonial.imageAlt + '" loading="lazy" />';
+      }
+      html += '<div class="' + CSS_PREFIX + 'author-info">';
+      html += '<span class="' + CSS_PREFIX + 'name">' + testimonial.name + '</span>';
+      if (testimonial.role) {
+        html += '<span class="' + CSS_PREFIX + 'role">' + testimonial.role + '</span>';
+      }
+      html += '</div></div></div>';
+    }
+
     return html;
   }
 
@@ -8490,6 +8510,40 @@
     '  margin-top: 4px;' +
     '}' +
 
+    /* ── Stacked layout ── */
+    '.' + CSS_PREFIX + 'stacked-card {' +
+    '  display: flex;' +
+    '  flex-direction: column;' +
+    '  height: 100%;' +
+    '  padding: var(--sdl-ts-card-padding, 40px);' +
+    '  box-sizing: border-box;' +
+    '  border-radius: var(--sdl-ts-card-radius, 16px);' +
+    '  background: var(--sdl-ts-card-bg, #f5f5f5);' +
+    '  border: var(--sdl-ts-card-border, none);' +
+    '}' +
+    '.' + CSS_PREFIX + 'stacked-card .' + CSS_PREFIX + 'quote-icon {' +
+    '  margin-bottom: 20px;' +
+    '}' +
+    '.' + CSS_PREFIX + 'stacked-card .' + CSS_PREFIX + 'stars {' +
+    '  margin-bottom: 16px;' +
+    '}' +
+    '.' + CSS_PREFIX + 'stacked-card .' + CSS_PREFIX + 'quote {' +
+    '  flex: 1;' +
+    '  line-height: 1.7;' +
+    '  margin: 0 0 28px 0 !important;' +
+    '}' +
+    '.' + CSS_PREFIX + 'stacked-card .' + CSS_PREFIX + 'author {' +
+    '  display: flex;' +
+    '  align-items: center;' +
+    '  gap: 14px;' +
+    '  margin-top: auto;' +
+    '}' +
+    '.' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked .swiper {' +
+    '  overflow: visible;' +
+    '  max-width: 500px;' +
+    '  margin: 0 auto;' +
+    '}' +
+
     /* ── Navigation ── */
     '.' + CSS_PREFIX + 'arrows {' +
     '  display: flex;' +
@@ -8614,6 +8668,7 @@
     wrapper.className = CSS_PREFIX + 'wrapper';
     if (settings.overflow) wrapper.classList.add(CSS_PREFIX + 'overflow');
     if (settings.autoplay && settings.autoplayMode === 'continuous') wrapper.classList.add(CSS_PREFIX + 'continuous');
+    if (settings.layout === 'stacked') wrapper.classList.add(CSS_PREFIX + 'layout-stacked');
 
     // Set CSS custom properties for card styling
     if (settings.cardBorder) {
@@ -8813,6 +8868,7 @@
       slidesPerGroup: settings.slidesPerGroup || 1,
       loop: settings.loop && totalSlides > settings.slidesPerView,
       grabCursor: true,
+      mousewheel: { enabled: true, forceToAxis: true },
       keyboard: { enabled: true, onlyInViewport: true },
       a11y: {
         enabled: true,
@@ -8870,6 +8926,23 @@
         0: { slidesPerView: 2, spaceBetween: -10 },
         768: { slidesPerView: 3, spaceBetween: -15 },
         1024: { slidesPerView: 4, spaceBetween: -20 },
+      };
+    }
+
+    if (settings.layout === 'stacked') {
+      config.effect = 'cards';
+      config.cardsEffect = {
+        slideShadows: true,
+        perSlideOffset: 8,
+        perSlideRotate: 2,
+        rotate: true,
+      };
+      config.slidesPerView = 1;
+      config.grabCursor = true;
+      config.breakpoints = {
+        0: { slidesPerView: 1 },
+        768: { slidesPerView: 1 },
+        1024: { slidesPerView: 1 },
       };
     }
 

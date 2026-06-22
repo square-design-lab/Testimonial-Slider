@@ -363,6 +363,15 @@
         .layout-tilted .pv-quote-icon svg { fill: #fff !important; opacity: 0.3; }
         .layout-tilted .pv-tilted-divider { width: 40px; height: 2px; background: rgba(255,255,255,0.4); margin: 4px 0; order: 1; }
 
+        .layout-stacked .swiper { overflow: hidden; max-width: 420px; margin: 0 auto; }
+        .layout-stacked .swiper-wrapper { overflow: hidden !important; }
+        .layout-stacked .swiper-slide { max-width: 420px; }
+        .layout-stacked .pv-card { text-align: center; align-items: center; padding: 40px 36px; position: relative; }
+        .layout-stacked .pv-card-header { flex-direction: column; gap: 8px; order: 2; }
+        .layout-stacked .pv-author-info { align-items: center; }
+        .layout-stacked .pv-avatar { width: 56px; height: 56px; font-size: 18px; }
+        .layout-stacked .pv-quote { font-size: 16px; line-height: 1.7; }
+
         /* Navigation elements in preview */
         .pv-nav-wrapper {
             display: flex; align-items: center; gap: 12px;
@@ -448,8 +457,9 @@
                             <option value="colorful">Colorful</option>
                             <option value="review">Review</option>
                             <option value="tilted">Tilted</option>
+                            <option value="stacked">Stacked</option>
                         </select>
-                        <div class="helper-text"><strong>Cards</strong> — bordered grid. <strong>Spotlight</strong> — centered single focus. <strong>Minimal</strong> — clean text-first. <strong>Magazine</strong> — editorial accent. <strong>Colorful</strong> — rotating color backgrounds. <strong>Review</strong> — dark cards with stars. <strong>Tilted</strong> — rotated overlapping cards.</div>
+                        <div class="helper-text"><strong>Cards</strong> — bordered grid. <strong>Spotlight</strong> — centered single focus. <strong>Minimal</strong> — clean text-first. <strong>Magazine</strong> — editorial accent. <strong>Colorful</strong> — rotating color backgrounds. <strong>Review</strong> — dark cards with stars. <strong>Tilted</strong> — rotated overlapping cards. <strong>Stacked</strong> — single card with depth stack effect.</div>
                     </div>
                 </div>
             </div>
@@ -750,7 +760,7 @@
           const isMobile = host.classList.contains('mobile');
           const layout = cfg.layout;
           let spv = Math.max(1, isMobile ? cfg.spvSm : cfg.spvLg);
-          if (layout === 'spotlight' || layout === 'magazine') spv = 1;
+          if (layout === 'spotlight' || layout === 'magazine' || layout === 'stacked') spv = 1;
           let gap = cfg.spaceBetween;
           if (layout === 'tilted') { spv = isMobile ? 2 : 4; gap = -15; }
 
