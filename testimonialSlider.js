@@ -8580,6 +8580,17 @@
     '.' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked,' +
     '.' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked-split {' +
     '  overflow: hidden;' +
+    '  padding: 0 40px;' +
+    '}' +
+    '@media (max-width: 767px) {' +
+    '  .' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked .swiper,' +
+    '  .' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked-split .swiper {' +
+    '    max-width: calc(100% - 20px);' +
+    '  }' +
+    '  .' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked,' +
+    '  .' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked-split {' +
+    '    padding: 0 20px;' +
+    '  }' +
     '}' +
 
     /* ── Stacked Split layout (image left + content right) ── */
@@ -9091,6 +9102,29 @@
     }
 
     var swiper = new Swiper(built.swiperEl, config);
+
+    // Alternating tilt for stacked layouts
+    if (settings.layout === 'stacked' || settings.layout === 'stacked-split') {
+      swiper.on('setTranslate', function () {
+        var slides = swiper.slides;
+        if (!slides || !slides.length) return;
+        for (var si = 0; si < slides.length; si++) {
+          var slide = slides[si];
+          var inner = slide.querySelector('.swiper-slide-transform') || slide;
+          var tf = inner.style.transform;
+          if (!tf) continue;
+          var match = tf.match(/rotateZ\(([^)]+)deg\)/);
+          if (!match) continue;
+          var rot = parseFloat(match[1]);
+          if (rot === 0) continue;
+          var progress = slide.progress;
+          var idx = Math.abs(Math.round(progress));
+          if (idx > 0 && idx % 2 === 0) {
+            inner.style.transform = tf.replace(/rotateZ\([^)]+\)/, 'rotateZ(' + (-rot) + 'deg)');
+          }
+        }
+      });
+    }
 
     // Counter update
     if (built.counterEl) {
