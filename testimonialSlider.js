@@ -7722,7 +7722,7 @@
    *  DEFAULT SETTINGS
    * ────────────────────────────────────────────────────────────── */
   var DEFAULTS = {
-    layout: 'cards',          // 'cards' | 'spotlight' | 'minimal' | 'magazine' | 'colorful' | 'review' | 'tilted' | 'stacked'
+    layout: 'cards',          // 'cards' | 'spotlight' | 'minimal' | 'magazine' | 'colorful' | 'review' | 'tilted'
     slidesPerView: 3,
     spaceBetween: 24,
     speed: 500,
@@ -7877,7 +7877,6 @@
       if (merged.layout === 'spotlight') merged.slidesPerView = 1;
       else if (merged.layout === 'minimal') merged.slidesPerView = 3;
       else if (merged.layout === 'magazine') merged.slidesPerView = 1;
-      else if (merged.layout === 'stacked' || merged.layout === 'stacked-split') { merged.slidesPerView = 1; merged.overflow = false; }
       else merged.slidesPerView = 3; // cards
     }
 
@@ -8124,49 +8123,6 @@
       html += '</div>';
     }
 
-    else if (layout === 'stacked') {
-      html += '<div class="' + CSS_PREFIX + 'stacked-card">';
-      if (settings.showStarRating) {
-        html += buildStarRating(settings.starCount);
-      } else if (settings.showQuoteIcon) {
-        html += QUOTE_ICON_SVG;
-      }
-      html += '<p class="' + CSS_PREFIX + 'quote">' + testimonial.quote + '</p>';
-      html += '<div class="' + CSS_PREFIX + 'author">';
-      if (testimonial.image) {
-        html += '<img class="' + CSS_PREFIX + 'avatar" src="' + testimonial.image + '" alt="' + testimonial.imageAlt + '" loading="lazy" />';
-      }
-      html += '<div class="' + CSS_PREFIX + 'author-info">';
-      html += '<span class="' + CSS_PREFIX + 'name">' + testimonial.name + '</span>';
-      if (testimonial.role) {
-        html += '<span class="' + CSS_PREFIX + 'role">' + testimonial.role + '</span>';
-      }
-      html += '</div></div></div>';
-    }
-
-    else if (layout === 'stacked-split') {
-      html += '<div class="' + CSS_PREFIX + 'stacked-split-card">';
-      if (testimonial.image) {
-        html += '<img class="' + CSS_PREFIX + 'split-image" src="' + testimonial.image + '" alt="' + testimonial.imageAlt + '" loading="lazy" />';
-      } else {
-        var initials = (testimonial.name || '').split(' ').map(function (w) { return w.charAt(0); }).join('').toUpperCase();
-        html += '<div class="' + CSS_PREFIX + 'split-image-placeholder">' + initials + '</div>';
-      }
-      html += '<div class="' + CSS_PREFIX + 'split-content">';
-      if (settings.showStarRating) {
-        html += buildStarRating(settings.starCount);
-      } else if (settings.showQuoteIcon) {
-        html += QUOTE_ICON_SVG;
-      }
-      html += '<p class="' + CSS_PREFIX + 'quote">' + testimonial.quote + '</p>';
-      html += '<div class="' + CSS_PREFIX + 'author-info">';
-      html += '<span class="' + CSS_PREFIX + 'name">' + testimonial.name + '</span>';
-      if (testimonial.role) {
-        html += '<span class="' + CSS_PREFIX + 'role">' + testimonial.role + '</span>';
-      }
-      html += '</div></div></div>';
-    }
-
     return html;
   }
 
@@ -8295,11 +8251,6 @@
     '  box-sizing: border-box;' +
     '  height: auto !important;' +
     '}' +
-    '.' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked .swiper-slide,' +
-    '.' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked-split .swiper-slide {' +
-    '  height: initial !important;' +
-    '}' +
-
     /* ── Cards layout ── */
     '.' + CSS_PREFIX + 'card {' +
     '  display: flex;' +
@@ -8538,114 +8489,6 @@
     '  margin-top: 4px;' +
     '}' +
 
-    /* ── Stacked layout ── */
-    '.' + CSS_PREFIX + 'stacked-card {' +
-    '  display: flex;' +
-    '  flex-direction: column;' +
-    '  height: 100%;' +
-    '  padding: var(--sdl-ts-card-padding, 40px);' +
-    '  box-sizing: border-box;' +
-    '  border-radius: var(--sdl-ts-card-radius, 16px);' +
-    '  background: var(--sdl-ts-card-bg, #f5f5f5);' +
-    '  border: var(--sdl-ts-card-border, none);' +
-    '}' +
-    '.' + CSS_PREFIX + 'stacked-card .' + CSS_PREFIX + 'quote-icon {' +
-    '  margin-bottom: 20px;' +
-    '}' +
-    '.' + CSS_PREFIX + 'stacked-card .' + CSS_PREFIX + 'stars {' +
-    '  margin-bottom: 16px;' +
-    '}' +
-    '.' + CSS_PREFIX + 'stacked-card .' + CSS_PREFIX + 'quote {' +
-    '  flex: 1;' +
-    '  line-height: 1.7;' +
-    '  margin: 0 0 28px 0 !important;' +
-    '}' +
-    '.' + CSS_PREFIX + 'stacked-card .' + CSS_PREFIX + 'author {' +
-    '  display: flex;' +
-    '  align-items: center;' +
-    '  gap: 14px;' +
-    '  margin-top: auto;' +
-    '}' +
-    '.' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked .swiper,' +
-    '.' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked-split .swiper {' +
-    '  overflow: visible !important;' +
-    '  max-width: 500px;' +
-    '  margin: 0 auto;' +
-    '  position: relative;' +
-    '}' +
-    '.' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked .swiper-wrapper,' +
-    '.' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked-split .swiper-wrapper {' +
-    '  position: relative;' +
-    '}' +
-    '.' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked,' +
-    '.' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked-split {' +
-    '  overflow: hidden;' +
-    '  padding: 20px 60px 80px 40px;' +
-    '}' +
-    '@media (max-width: 767px) {' +
-    '  .' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked .swiper,' +
-    '  .' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked-split .swiper {' +
-    '    max-width: calc(100% - 20px);' +
-    '  }' +
-    '  .' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked,' +
-    '  .' + CSS_PREFIX + 'wrapper.sdl-ts-layout-stacked-split {' +
-    '    padding: 20px 40px 60px 20px;' +
-    '  }' +
-    '}' +
-
-    /* ── Stacked Split layout (image left + content right) ── */
-    '.' + CSS_PREFIX + 'stacked-split-card {' +
-    '  display: flex;' +
-    '  align-items: center;' +
-    '  gap: 32px;' +
-    '  height: 100%;' +
-    '  padding: var(--sdl-ts-card-padding, 40px);' +
-    '  box-sizing: border-box;' +
-    '  border-radius: var(--sdl-ts-card-radius, 16px);' +
-    '  background: var(--sdl-ts-card-bg, #f5f5f5);' +
-    '  border: var(--sdl-ts-card-border, none);' +
-    '}' +
-    '.' + CSS_PREFIX + 'stacked-split-card .' + CSS_PREFIX + 'split-image {' +
-    '  flex: 0 0 auto;' +
-    '  width: var(--sdl-ts-img-w, 120px);' +
-    '  height: var(--sdl-ts-img-h, 120px);' +
-    '  border-radius: var(--sdl-ts-card-radius, 16px);' +
-    '  object-fit: cover;' +
-    '}' +
-    '.' + CSS_PREFIX + 'stacked-split-card .' + CSS_PREFIX + 'split-image-placeholder {' +
-    '  flex: 0 0 auto;' +
-    '  width: var(--sdl-ts-img-w, 120px);' +
-    '  height: var(--sdl-ts-img-h, 120px);' +
-    '  border-radius: var(--sdl-ts-card-radius, 16px);' +
-    '  background: #ddd;' +
-    '  display: flex; align-items: center; justify-content: center;' +
-    '  font-size: 32px; font-weight: 600; color: #999;' +
-    '}' +
-    '.' + CSS_PREFIX + 'stacked-split-card .' + CSS_PREFIX + 'split-content {' +
-    '  flex: 1;' +
-    '  display: flex;' +
-    '  flex-direction: column;' +
-    '  min-width: 0;' +
-    '}' +
-    '.' + CSS_PREFIX + 'stacked-split-card .' + CSS_PREFIX + 'quote {' +
-    '  flex: 1;' +
-    '  line-height: 1.7;' +
-    '  margin: 0 0 16px 0 !important;' +
-    '}' +
-    '.' + CSS_PREFIX + 'stacked-split-card .' + CSS_PREFIX + 'author-info {' +
-    '  margin-top: auto;' +
-    '}' +
-    '@media (max-width: 600px) {' +
-    '  .' + CSS_PREFIX + 'stacked-split-card {' +
-    '    flex-direction: column;' +
-    '    text-align: center;' +
-    '  }' +
-    '  .' + CSS_PREFIX + 'stacked-split-card .' + CSS_PREFIX + 'split-image,' +
-    '  .' + CSS_PREFIX + 'stacked-split-card .' + CSS_PREFIX + 'split-image-placeholder {' +
-    '    width: var(--sdl-ts-img-w, 80px) !important;' +
-    '    height: var(--sdl-ts-img-h, 80px) !important;' +
-    '  }' +
-    '}' +
 
     /* ── Navigation ── */
     '.' + CSS_PREFIX + 'arrows {' +
@@ -8786,8 +8629,6 @@
     wrapper.className = CSS_PREFIX + 'wrapper';
     if (settings.overflow) wrapper.classList.add(CSS_PREFIX + 'overflow');
     if (settings.autoplay && settings.autoplayMode === 'continuous') wrapper.classList.add(CSS_PREFIX + 'continuous');
-    if (settings.layout === 'stacked') wrapper.classList.add(CSS_PREFIX + 'layout-stacked');
-    if (settings.layout === 'stacked-split') wrapper.classList.add(CSS_PREFIX + 'layout-stacked-split');
 
     // Set CSS custom properties for card styling
     if (settings.cardBorder) {
@@ -9048,25 +8889,6 @@
       };
     }
 
-    if (settings.layout === 'stacked' || settings.layout === 'stacked-split') {
-      config.effect = 'cards';
-      config.cardsEffect = {
-        slideShadows: false,
-        perSlideOffset: 8,
-        perSlideRotate: 0,
-        rotate: false,
-      };
-      config.slidesPerView = 1;
-      config.spaceBetween = 0;
-      config.grabCursor = true;
-      config.loop = false;
-      config.breakpoints = {
-        0: { slidesPerView: 1, spaceBetween: 0 },
-        768: { slidesPerView: 1, spaceBetween: 0 },
-        1024: { slidesPerView: 1, spaceBetween: 0 },
-      };
-    }
-
     // Overflow — no fractional slidesPerView needed; peek handled by DOM clone element
 
     // Autoplay (non-continuous)
@@ -9103,36 +8925,6 @@
     }
 
     var swiper = new Swiper(built.swiperEl, config);
-
-    // Diagonal fan-out for stacked layouts (CodePen-style: translate down-right, no rotation)
-    if (settings.layout === 'stacked' || settings.layout === 'stacked-split') {
-      var applyStackedFanOut = function () {
-        var slides = swiper.slides;
-        if (!slides || !slides.length) return;
-        for (var si = 0; si < slides.length; si++) {
-          var slide = slides[si];
-          var progress = slide.progress;
-          var inner = slide.querySelector('.swiper-slide-transform') || slide;
-          var tf = inner.style.transform;
-          if (!tf) continue;
-          var absP = Math.abs(progress);
-          var yOffset = progress < -0.01 ? absP * 12 : 0;
-          tf = tf.replace(/translate3d\(([^,]+),\s*([^,]+),/, function (match, x) {
-            return 'translate3d(' + x + ', ' + yOffset + 'px,';
-          });
-          inner.style.transform = tf;
-          if (progress < -0.01) {
-            inner.style.opacity = Math.max(1 - absP * 0.1, 0.5);
-          } else if (progress > 0.5) {
-            inner.style.opacity = 0;
-          } else {
-            inner.style.opacity = 1;
-          }
-        }
-      };
-      swiper.on('setTranslate', applyStackedFanOut);
-      applyStackedFanOut();
-    }
 
     // Counter update
     if (built.counterEl) {
@@ -9263,6 +9055,7 @@
 
       wrapper.remove();
     });
+    removeFOUCStyles();
   }
 
   /* ──────────────────────────────────────────────────────────────────

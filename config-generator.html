@@ -363,24 +363,6 @@
         .layout-tilted .pv-quote-icon svg { fill: #fff !important; opacity: 0.3; }
         .layout-tilted .pv-tilted-divider { width: 40px; height: 2px; background: rgba(255,255,255,0.4); margin: 4px 0; order: 1; }
 
-        .layout-stacked .swiper { overflow: hidden; max-width: 420px; margin: 0 auto; }
-        .layout-stacked .swiper-wrapper { overflow: hidden !important; }
-        .layout-stacked .swiper-slide { max-width: 420px; }
-        .layout-stacked .pv-card { text-align: center; align-items: center; padding: 40px 36px; position: relative; }
-        .layout-stacked .pv-card-header { flex-direction: column; gap: 8px; order: 2; }
-        .layout-stacked .pv-author-info { align-items: center; }
-        .layout-stacked .pv-avatar { width: 56px; height: 56px; font-size: 18px; }
-        .layout-stacked .pv-quote { font-size: 16px; line-height: 1.7; }
-
-        .layout-stacked-split .swiper { overflow: hidden; max-width: 480px; margin: 0 auto; }
-        .layout-stacked-split .swiper-wrapper { overflow: hidden !important; }
-        .layout-stacked-split .swiper-slide { max-width: 480px; }
-        .layout-stacked-split .pv-split-card { display: flex; flex-direction: row; align-items: center; gap: 24px; }
-        .layout-stacked-split .pv-split-image { flex: 0 0 auto; width: 100px; height: 100px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 600; color: #fff; }
-        .layout-stacked-split .pv-split-content { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-        .layout-stacked-split .pv-split-content .pv-quote { font-size: 14px; line-height: 1.6; }
-        .layout-stacked-split .pv-split-content .pv-author-info { margin-top: 4px; }
-
         .pv-nav-wrapper.pos-center { top: 50%; left: 0; right: 0; transform: translateY(-50%); display: flex; justify-content: space-between; pointer-events: none; width: 100%; }
         .pv-nav-wrapper.pos-center .pv-arrow-btn, .pv-nav-wrapper.pos-center .pv-arrow-text { pointer-events: auto; }
 
@@ -469,10 +451,8 @@
                             <option value="colorful">Colorful</option>
                             <option value="review">Review</option>
                             <option value="tilted">Tilted</option>
-                            <option value="stacked">Stacked</option>
-                            <option value="stacked-split">Stacked Split</option>
                         </select>
-                        <div class="helper-text"><strong>Cards</strong> — bordered grid. <strong>Spotlight</strong> — centered single focus. <strong>Minimal</strong> — clean text-first. <strong>Magazine</strong> — editorial accent. <strong>Colorful</strong> — rotating color backgrounds. <strong>Review</strong> — dark cards with stars. <strong>Tilted</strong> — rotated overlapping cards. <strong>Stacked</strong> — single card with depth stack effect. <strong>Stacked Split</strong> — image left, content right with stack effect.</div>
+                        <div class="helper-text"><strong>Cards</strong> — bordered grid. <strong>Spotlight</strong> — centered single focus. <strong>Minimal</strong> — clean text-first. <strong>Magazine</strong> — editorial accent. <strong>Colorful</strong> — rotating color backgrounds. <strong>Review</strong> — dark cards with stars. <strong>Tilted</strong> — rotated overlapping cards.</div>
                     </div>
                 </div>
             </div>
@@ -774,7 +754,7 @@
           const isMobile = host.classList.contains('mobile');
           const layout = cfg.layout;
           let spv = Math.max(1, isMobile ? cfg.spvSm : cfg.spvLg);
-          if (layout === 'spotlight' || layout === 'magazine' || layout === 'stacked' || layout === 'stacked-split') spv = 1;
+          if (layout === 'spotlight' || layout === 'magazine') spv = 1;
           let gap = cfg.spaceBetween;
           if (layout === 'tilted') { spv = isMobile ? 2 : 4; gap = -15; }
 
@@ -818,15 +798,6 @@
             const slideW = layout === 'tilted'
               ? `width:calc((100% - ${Math.max(0,(spv-1)*Math.abs(gap))}px) / ${spv})`
               : `width:calc((100% - ${(spv-1)*Math.max(0,gap)}px) / ${spv})`;
-
-            if (layout === 'stacked-split') {
-              return `<div class="swiper-slide" style="${slideW}">
-                <div class="pv-card pv-split-card" style="${extraStyle}">
-                  <div class="pv-split-image" style="background:${color}">${initials}</div>
-                  <div class="pv-split-content">${decoration}${quote}<div class="pv-author-info"><div class="pv-name">${t.name}</div><div class="pv-role">${t.role}</div></div></div>
-                </div>
-              </div>`;
-            }
 
             return `<div class="swiper-slide" style="${slideW}">
               <div class="pv-card" style="${extraStyle}">${decoration}${quote}${extraContent}${header}</div>
@@ -965,13 +936,8 @@
           // Mutual exclusion: quoteIcon vs starRating
           // Handled in event listeners below
 
-          // Hide overflow for stacked layouts
-          const isStacked = val('layout') === 'stacked' || val('layout') === 'stacked-split';
-          document.getElementById('overflowRow').style.display = isStacked ? 'none' : 'flex';
-          if (isStacked) document.getElementById('overflowVisible').checked = false;
-
           // Overflow peek sub-options
-          document.getElementById('overflowPeekGroup').style.display = (!isStacked && chk('overflowVisible')) ? 'block' : 'none';
+          document.getElementById('overflowPeekGroup').style.display = chk('overflowVisible') ? 'block' : 'none';
 
           // Colorful palette group
           const isColorful = val('layout') === 'colorful';
